@@ -1,0 +1,11 @@
+FRONTEND
+cd frontend
+npm install
+npm start
+
+BACKEND
+create conda environment from yml file
+update database link
+change init_db.py file for initializing the database and add users
+python init_db.py
+python main.py

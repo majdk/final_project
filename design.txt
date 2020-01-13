@@ -1,0 +1,41 @@
+We have the following main models:
+---------------------------------------
+
+User: Describes a user in the system
+_______________________________________
+
+Travel: Describes a post (travel plan) in the site
+_______________________________________
+
+Subscribe: Describes a user subsription on a post in the site
+_______________________________________
+
+Notification: Describes a notification for a user
+[We think we need the id field we added as there may be many notifications for same post/subscribtion]
+_______________________________________
+
+Follow: Describes follow relationship between users
+_______________________________________
+
+* Fields in classes may change for the full project when we start implementing related stuff.
+
+______________________________________________________________________________________________________
+______________________________________________________________________________________________________
+
+
+And the following main relationships:
+---------------------------------------
+
+User <-> Travel
+This allows us to get travels/posts of a user from a user object,
+and get a user object for the traveler posting the post.
+_______________________________________
+
+User <-> Follow
+We have two relationships so we can get given a user, it's followers
+and following list of people.
+_______________________________________
+
+Subscribe <-> Notification
+Given a subscription we want to get the notifications tied to it.
+_______________________________________
