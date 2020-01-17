@@ -109,7 +109,7 @@ def logout():
     return 'Logged Out', 201
 
 
-@app.route("/users/<int:user_id>", methods=['GET'])
+@app.route("/users/<string:user_id>", methods=['GET'])
 @login_required
 def getUser(user_id):
     print(user_id)
@@ -117,10 +117,10 @@ def getUser(user_id):
     if not user:
         print("why not found")
         abort(404)
-    image_file = url_for('static', filename='profile_pics/' + user.image_file)
-    return make_response(jsonify({'username': user.username, 'first_name': user.first_name, 'last_name': user.last_name,
+    # image_file = url_for('static', filename='profile_pics/' + user.image_file)
+    return make_response(jsonify({'user_id':user.id,'username': user.username, 'first_name': user.first_name, 'last_name': user.last_name,
                                   'gender': user.gender, 'birth_date': user.birth_date, 'email': user.email,
-                                  'image_file': image_file, 'followers': len(user.followers.all()),
+                                  'followers': len(user.followers.all()),
                                   'followed': len(user.followed.all())}), 200)
 
 @app.route("/users/<int:user_id>/posts", methods=['GET'])
