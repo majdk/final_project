@@ -110,11 +110,11 @@ def logout():
     return 'Logged Out', 201
 
 
-@app.route("/users/<string:user_id>", methods=['GET'])
+@app.route("/users/<int:user_id>", methods=['GET'])
 @login_required
 def getUser(user_id):
     print(user_id)
-    user = User.query.filter_by(username=user_id).first()
+    user = User.query.filter_by(id=user_id).first()
     if not user:
         print("why not found")
         abort(404)
