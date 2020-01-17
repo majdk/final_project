@@ -84,12 +84,12 @@ def login():
 
     user = User.query.filter_by(email=user_data['email']).first()
 
-    print(" the user is :" )
-    print(user)
-    print("user data is :")
-    print(user_data)
-    print(user.password)
-    print(user_data['password'])
+    # print(" the user is :" )
+    # print(user)
+    # print("user data is :")
+    # print(user_data)
+    # print(user.password)
+    # print(user_data['password'])
     if user and bcrypt.check_password_hash(user.password, user_data['password']):
         print("im login")
         login_user(user, remember=True)
