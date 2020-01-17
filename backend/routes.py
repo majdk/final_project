@@ -61,7 +61,7 @@ def register():
     if check_user:
         return 'Username Taken'
     hashed_password = bcrypt.generate_password_hash(data['password']).decode('utf-8')
-    user = User(username=data['username'], first_name=data['first_name'], last_name=data['last_name'],
+    user = User(username=data['username'], first_name=data['firstname'], last_name=data['lastname'],
                 email=data['email'],
                 password=hashed_password)
     print("oh we got here")
