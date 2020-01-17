@@ -33,9 +33,8 @@ const useStyles = theme => ({
 export const signup = user => {
     axios.defaults.withCredentials = true;
     return axios
-        .post('http://127.0.0.1:5000/user/new', user)
+        .post('http://127.0.0.1:5000/user', user)
         .then(response => {
-            localStorage.setItem('usertoken', response.data)
             return response.data
         })
         .catch(err => {
@@ -90,7 +89,7 @@ class SignUp extends Component {
         }
         signup(user).then(res => {
             if (res != 'error') {
-                this.props.history.push(`/`)
+                this.props.history.push(`/login`)
             }
             else {
                 this.setState({invalid: 1});
@@ -190,6 +189,7 @@ class SignUp extends Component {
                             variant="contained"
                             color="primary"
                             className={classes.submit}
+                            onClick={this.onSubmit}
                         >
                             Sign Up
                         </Button>
