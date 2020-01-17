@@ -131,7 +131,10 @@ def getUserPosts(user_id):
     if not user:
         abort(404)
     userPosts = user.travels
-    return make_response(jsonify({'user_posts':userPosts}), 200)
+    json_list = [i.to_json() for i in userPosts]
+    print(json_list)
+    return make_response(jsonify(json_list),200)
+
 @app.route("/user/addpost", methods=['POST'])
 @login_required
 def addPost():
@@ -164,3 +167,4 @@ def addPost():
     newTravel=Travel.query.filter_by(city=city).first()
 
     return  make_response(jsonify({'userid':newTravel.user_id,'the_user:':user_id}), 200)
+

@@ -65,6 +65,12 @@ class Travel(db.Model):
     def __repr__(self):
         return f"Travel('{self.date_posted}')"
 
+    def to_json(self):
+        json_travel={'city': self.city, 'country': self.country,
+                      'content': self.content, 'title': self.title,'userid':self.user_id }
+        return json_travel
+
+
 
 # db.drop_all()
 # db.create_all()
