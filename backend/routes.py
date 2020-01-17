@@ -50,8 +50,8 @@ def register():
         abort(400)
     data = request.get_json()
     print(data)
-    if not data or not 'password' in data or not 'username' in data or not 'first_name' in data \
-            or not 'last_name' in data or not 'gender' in data or not 'birth_date' in data or not 'email' in data:
+    if not data or not 'password' in data or not 'username' in data or not 'firstname' in data \
+            or not 'lastname' in data or not 'email' in data:
         print("aborted after first check")
         abort(400)
     check_user = User.query.filter_by(email=data['email']).first()
@@ -62,7 +62,7 @@ def register():
         return 'Username Taken'
     hashed_password = bcrypt.generate_password_hash(data['password']).decode('utf-8')
     user = User(username=data['username'], first_name=data['first_name'], last_name=data['last_name'],
-                gender=data['gender'], birth_date=datetime.datetime.now(), email=data['email'],
+                email=data['email'],
                 password=hashed_password)
     print("oh we got here")
     db.session.add(user)
