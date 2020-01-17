@@ -1,7 +1,7 @@
 from flask import url_for, request, abort, jsonify, make_response
 from PIL import Image
-from backend import app, login_manager, bcrypt, db
-from backend.models import User
+from backend import app, login_manager, bcrypt, db, geolocator
+from backend.models import User,Travel
 from flask_login import login_user, current_user, logout_user, login_required
 from flask_jwt_extended import (create_access_token)
 import datetime
@@ -124,7 +124,7 @@ def getUser(user_id):
                                   'followers': len(user.followers.all()),
                                   'followed': len(user.followed.all())}), 200)
 
-@app.route("/users/<int:user_id>/posts", methods=['GET'])
+@app.route("/users/posts/<int:user_id>", methods=['GET'])
 @login_required
 def getUserPosts(user_id):
     user = User.query.filter_by(id=user_id).first()
@@ -132,3 +132,35 @@ def getUserPosts(user_id):
         abort(404)
     userPosts = user.travels
     return make_response(jsonify({'user_posts':userPosts}), 200)
+@app.route("/user/addpost", methods=['POST'])
+@login_required
+def addPost():
+    data = request.get_json()
+    user_id=current_user.get_id()
+    if not user_id:
+        abort(404)
+    user = User.query.filter_by(id=user_id).first()
+    if not user:
+        abort(404)
+    if not data or not 'title' in data or not 'start_date' in data or not 'end_date' in data \
+            or not 'latitude' in data or not 'longitude' in data or not 'content' in data:
+        abort(404)
+    lat=data['latitude']
+    long=data['longitude']
+    location = geolocator.reverse([lat, long])
+    country=location.raw['address']['country']
+    city=location.raw['address']['city']
+    if not city:
+        city = "unknown city"
+    if not country:
+        country = "unkown country"
+    datenow=datetime.datetime.now()
+
+    travel=Travel( title=data['title'], start_date=data['start_date'],
+         end_date=data['end_date'],country=country,city=city,latitude=lat,longitude=long
+                   ,content=data['content'],date_posted=datenow)
+    user.travels.append(travel)
+    db.session.commit()
+    newTravel=Travel.query.filter_by(city=city).first()
+
+    return  make_response(jsonify({'userid':newTravel.user_id,'the_user:':user_id}), 200)
