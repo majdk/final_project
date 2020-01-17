@@ -4,7 +4,7 @@ import { BrowserRouter as Router, Route } from 'react-router-dom'
 import Navbar from './Component/Navbar'
 import Landing from './Component/Landing'
 import SignIn from './Component/Login'
-import Signup from './Component/Signup'
+import SignUp from './Component/Signup'
 
 import {Redirect} from "react-router-dom";
 
@@ -29,7 +29,7 @@ class App extends Component {
           <div className="container">
             <Route exact path="/register" render={(props) => (
                 isLoggedIn() ? (
-                    <Redirect to="/"/>) : (<Signup {...props} />)
+                    <Redirect to="/"/>) : (<SignUp {...props} />)
             )}/>
             <Route exact path="/login" render={(props) => (
                 isLoggedIn() ? (

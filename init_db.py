@@ -8,3 +8,4 @@ user2 = User(id=12, username="majd", gender="male", email="majd@gmail.com", pass
 db.session.add(user)
 db.session.add(user2)
 db.session.commit()
+print(User.query.filter_by(id=12).first())

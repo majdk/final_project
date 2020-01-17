@@ -96,6 +96,7 @@ def login():
         access_token = create_access_token(identity={'id': user.id})
         result = access_token
     else:
+        print('Something wrong')
         abort(400)
 
     return result
