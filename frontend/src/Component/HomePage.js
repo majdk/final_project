@@ -195,7 +195,7 @@ class HomePage extends Component {
               <Button variant="outlined" color="primary" onClick={this.handleClickOpen} >
                 ADD POST
               </Button>
-              <Dialog open={this.state.add_post_open} onClose={this.handleClose} aria-labelledby="form-dialog-title">
+              <Dialog open={this.state.add_post_open} onClose={() => {this.handleClose(false)}} aria-labelledby="form-dialog-title">
                 <DialogTitle id="form-dialog-title">Add a Post</DialogTitle>
                 <DialogContent>
                   {/*<DialogContentText>*/}
@@ -262,7 +262,7 @@ class HomePage extends Component {
                 </DialogActions>
               </Dialog>
             </div>
-            <PostsFeed posts={this.state.posts_feed} />
+            <PostsFeed posts={this.state.posts_feed} my_profile={this.state.my_profile} />
           </Grid>
           <Grid item sm={2} xs={12} />
         </Grid>

@@ -31,7 +31,7 @@ class PostsFeed extends Component {
     return (
       <div className={classes.root}>
       {this.props.posts.map((post) =>
-          <Post post={post} key={post.title} />
+          <Post post={post} my_profile={this.props.my_profile} key={post.title} />
       )}
         {/*<Post />*/}
         {/*<Post />*/}
