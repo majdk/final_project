@@ -63,7 +63,7 @@ def register():
     hashed_password = bcrypt.generate_password_hash(data['password']).decode('utf-8')
     user = User(username=data['username'], first_name=data['firstname'], last_name=data['lastname'],
                 email=data['email'],
-                password=hashed_password,id=data['id'])
+                password=hashed_password)
     print("oh we got here")
     db.session.add(user)
     db.session.commit()
@@ -160,7 +160,7 @@ def addPost():
     else:
         country = "unkown country"
         city = "unknown city"
-    
+
     datenow=datetime.datetime.now()
 
     travel=Travel( title=data['title'], start_date=data['start_date'],
