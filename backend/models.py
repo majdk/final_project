@@ -7,17 +7,24 @@ from backend import db
 
 # from flask_login import UserMixin
 
-
 class Subscribe(db.Model):
     id = db.Column(db.Integer, unique=True, primary_key=True)
     post_id = db.Column(db.Integer, db.ForeignKey('travel.id'))
     subscriber_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     notifications = db.relationship('Notification', backref='subscribe')
 
+    def to_json(self):
+        json_travel={'post_id': self.post_id , 'subscriber_id':self.subscriber_id
+            , 'notifications' : [i.date_posted for i in self.notifications]}
+        return json_travel
+
 
 class Notification(db.Model):
     id = db.Column(db.Integer, unique=True, primary_key=True)
     subscribe_id = db.Column(db.Integer, db.ForeignKey('subscribe.id'))
+    date_posted = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+
 
 
 class Follow(db.Model):
@@ -44,6 +51,9 @@ class User(db.Model, UserMixin):
                                 backref=db.backref('followed', lazy='joined'),
                                 lazy='dynamic',
                                 cascade='all, delete-orphan')
+    subscribed_travels = db.relationship('Subscribe',
+                               backref=db.backref('subscriber', lazy='joined'),
+                               lazy='dynamic', cascade='all, delete-orphan')
 
     def __repr__(self):
         return f"User('{self.username}', '{self.email}', '{self.image_file}')"
@@ -61,6 +71,9 @@ class Travel(db.Model):
     latitude = db.Column(db.Text, nullable=False)
     longitude = db.Column(db.Text, nullable=False)
     content = db.Column(db.Text, nullable=False)
+    subscribed_users = db.relationship('Subscribe',
+                                         backref=db.backref('post', lazy='joined'),
+                                         lazy='dynamic', cascade='all, delete-orphan')
 
     def __repr__(self):
         return f"Travel('{self.date_posted}')"

@@ -1,7 +1,7 @@
 from flask import url_for, request, abort, jsonify, make_response
 from PIL import Image
 from backend import app, login_manager, bcrypt, db, geolocator
-from backend.models import User,Travel,Follow
+from backend.models import User,Travel,Follow,Subscribe,Notification
 from flask_login import login_user, current_user, logout_user, login_required
 from flask_jwt_extended import (create_access_token)
 import datetime
@@ -63,7 +63,7 @@ def register():
     hashed_password = bcrypt.generate_password_hash(data['password']).decode('utf-8')
     user = User(username=data['username'], first_name=data['firstname'], last_name=data['lastname'],
                 email=data['email'],
-                password=hashed_password)
+                password=hashed_password,id=data['id'])
     print("oh we got here")
     db.session.add(user)
     db.session.commit()
@@ -145,6 +145,100 @@ def addPost():
     user = User.query.filter_by(id=user_id).first()
     if not user:
         abort(404)
+    travel=createPost(data)
+    user.travels.append(travel)
+    db.session.commit()
+    newTravel=Travel.query.filter_by(city=travel.city).first() # for testing purpose
+
+    return  make_response(jsonify({'userid':newTravel.user_id,'the_user:':user_id}), 200)
+
+@app.route("/user/follow/<int:followed_user_id>", methods=['POST'])
+@login_required
+def follow(followed_user_id):
+    user_id = current_user.get_id()
+    if not user_id:
+        abort(404)
+    user = User.query.filter_by(id=user_id).first()
+    followed_user= User.query.filter_by(id=followed_user_id).first()
+    if not user or not followed_user:
+        abort(404)
+    follow_instance=Follow(follower_id=user_id,followed_id=followed_user_id)
+    db.session.add(follow_instance)
+    db.session.commit()
+    user = User.query.filter_by(id=user_id).first()
+    followed_user = User.query.filter_by(id=followed_user_id).first()
+    return make_response(jsonify({'myuserfollowList':len(user.followed.all()),'theotheruserfollowersList:':len(followed_user.followers.all())
+                                  ,'myuserfollowersList':len(user.followers.all()),'theuseruserfollowList:':len(followed_user.followed.all())}), 200)
+
+@app.route("/user/subscribe/<int:post_id>", methods=['POST'])
+@login_required
+def subscribe(post_id):
+    user_id = current_user.get_id()
+    if not user_id:
+        abort(404)
+    user = User.query.filter_by(id=user_id).first()
+    post= Travel.query.filter_by(id=post_id).first()
+    if not user or not post:
+        abort(404)
+    subInstance=Subscribe(post_id=post_id,subscriber_id=user_id)
+    user.subscribed_travels.append(subInstance)
+    db.session.commit()
+    return 'done but not tested'
+
+@app.route("/user/edit/<int:post_id>", methods=['POST'])
+@login_required
+def edit(post_id):
+    data = request.get_json()
+    user_id = current_user.get_id()
+    if not user_id:
+        print("oh no 194")
+        abort(404)
+    user = User.query.filter_by(id=user_id).first()
+    post= Travel.query.filter_by(id=post_id).first()
+    print("post id : ")
+    print(post_id)
+    print("post.user_id")
+    print(post.user_id)
+    print("user_id")
+    print(user_id)
+    if not user or not post or int(post.user_id) != int(user_id):
+        print("oh no 202")
+        abort(404)
+    subscribe=Subscribe.query.filter_by(post_id=post_id).all()
+    if not subscribe:
+        print("oh no 203")
+        abort(404)
+    newPost=createPost(data)
+    post.title=newPost.title
+    post.start_date = newPost.start_date
+    post.end_date = newPost.end_date
+    post.content = newPost.content
+    post.city = newPost.city
+    post.country = newPost.country
+    post.latitude = newPost.latitude
+    post.longitude = newPost.longitude
+    for i in subscribe:
+        notification = Notification(subscribe_id=i.id)
+        i.notifications.append(notification)
+    db.session.commit()
+    return 'done but not tested'
+
+@app.route("/user/notifications", methods=['GET'])
+@login_required
+def getNotifications():
+    user_id = current_user.get_id()
+    if not user_id:
+        abort(404)
+    user = User.query.filter_by(id=user_id).first()
+    if not user:
+        abort(404)
+    subscribed_travels = user.subscribed_travels
+    json_list = [i.to_json() for i in subscribed_travels]
+    print(json_list)
+    return make_response(jsonify(json_list),200)
+
+def createPost(data):
+
     if not data or not 'title' in data or not 'start_date' in data or not 'end_date' in data \
             or not 'latitude' in data or not 'longitude' in data or not 'content' in data:
         abort(404)
@@ -166,26 +260,4 @@ def addPost():
     travel=Travel( title=data['title'], start_date=data['start_date'],
          end_date=data['end_date'],country=country,city=city,latitude=lat,longitude=long
                    ,content=data['content'],date_posted=datenow)
-    user.travels.append(travel)
-    db.session.commit()
-    newTravel=Travel.query.filter_by(city=city).first()
-
-    return  make_response(jsonify({'userid':newTravel.user_id,'the_user:':user_id}), 200)
-
-@app.route("/user/follow/<int:followed_user_id>", methods=['POST'])
-@login_required
-def follow(followed_user_id):
-    user_id = current_user.get_id()
-    if not user_id:
-        abort(404)
-    user = User.query.filter_by(id=user_id).first()
-    followed_user= User.query.filter_by(id=followed_user_id).first()
-    if not user or not followed_user:
-        abort(404)
-    follow_instance=Follow(follower_id=user_id,followed_id=followed_user_id)
-    db.session.add(follow_instance)
-    db.session.commit()
-    user = User.query.filter_by(id=user_id).first()
-    followed_user = User.query.filter_by(id=followed_user_id).first()
-    return make_response(jsonify({'myuserfollowList':len(user.followed.all()),'theotheruserfollowersList:':len(followed_user.followers.all())
-                                  ,'myuserfollowersList':len(user.followers.all()),'theuseruserfollowList:':len(followed_user.followed.all())}), 200)
+    return travel
