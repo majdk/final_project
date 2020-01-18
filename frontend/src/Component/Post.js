@@ -10,8 +10,10 @@ import EditIcon from "@material-ui/icons/Edit";
 import CardActions from "@material-ui/core/CardActions";
 import AddAlertIcon from "@material-ui/icons/AddAlert";
 import NotificationsOffIcon from "@material-ui/icons/NotificationsOff";
+import NotificationsActiveIcon from '@material-ui/icons/NotificationsActive';
 import DeleteIcon from "@material-ui/icons/Delete";
 import dayjs from 'dayjs'
+import { UserContext } from "./UserContext"
 
 const MyCardHeader = withStyles({
   avatar: {
@@ -70,10 +72,12 @@ const useStyles = makeStyles(theme => ({
 </Typography> */
 
 let my_post = true;
-let notification_on = true;
+let notification_on = false;
 
 export default function Post(props) {
   const classes = useStyles();
+  const curr_user = React.useContext(UserContext);
+  const my_post = (curr_user === props.post.userid)
   return (
     <div className={classes.post_wrapper}>
       <MyCardHeader
@@ -97,7 +101,7 @@ export default function Post(props) {
               {!my_post && (
                 <IconButton size="small" aria-label="settings">
                   {notification_on ? (
-                    <AddAlertIcon />
+                    <NotificationsActiveIcon />
                   ) : (
                     <NotificationsOffIcon />
                   )}
