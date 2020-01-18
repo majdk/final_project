@@ -1,7 +1,7 @@
 from flask import url_for, request, abort, jsonify, make_response
 from PIL import Image
 from backend import app, login_manager, bcrypt, db, geolocator
-from backend.models import User,Travel
+from backend.models import User,Travel,Follow
 from flask_login import login_user, current_user, logout_user, login_required
 from flask_jwt_extended import (create_access_token)
 import datetime
@@ -63,7 +63,7 @@ def register():
     hashed_password = bcrypt.generate_password_hash(data['password']).decode('utf-8')
     user = User(username=data['username'], first_name=data['firstname'], last_name=data['lastname'],
                 email=data['email'],
-                password=hashed_password)
+                password=hashed_password,id=data['id'])
     print("oh we got here")
     db.session.add(user)
     db.session.commit()
@@ -151,12 +151,16 @@ def addPost():
     lat=data['latitude']
     long=data['longitude']
     location = geolocator.reverse([lat, long])
-    country=location.raw['address']['country']
-    city=location.raw['address']['city']
-    if not city:
-        city = "unknown city"
-    if not country:
+    if 'address' in location.raw and 'country' in location.raw['address']:
+        country=location.raw['address']['country']
+        if 'city' in location.raw['address']:
+            city = location.raw['address']['city']
+        else:
+            city = "unknown city"
+    else:
         country = "unkown country"
+        city = "unknown city"
+    
     datenow=datetime.datetime.now()
 
     travel=Travel( title=data['title'], start_date=data['start_date'],
@@ -168,3 +172,20 @@ def addPost():
 
     return  make_response(jsonify({'userid':newTravel.user_id,'the_user:':user_id}), 200)
 
+@app.route("/user/follow/<int:followed_user_id>", methods=['POST'])
+@login_required
+def follow(followed_user_id):
+    user_id = current_user.get_id()
+    if not user_id:
+        abort(404)
+    user = User.query.filter_by(id=user_id).first()
+    followed_user= User.query.filter_by(id=followed_user_id).first()
+    if not user or not followed_user:
+        abort(404)
+    follow_instance=Follow(follower_id=user_id,followed_id=followed_user_id)
+    db.session.add(follow_instance)
+    db.session.commit()
+    user = User.query.filter_by(id=user_id).first()
+    followed_user = User.query.filter_by(id=followed_user_id).first()
+    return make_response(jsonify({'myuserfollowList':len(user.followed.all()),'theotheruserfollowersList:':len(followed_user.followers.all())
+                                  ,'myuserfollowersList':len(user.followers.all()),'theuseruserfollowList:':len(followed_user.followed.all())}), 200)
