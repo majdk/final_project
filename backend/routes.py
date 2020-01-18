@@ -114,24 +114,31 @@ def logout():
 @login_required
 def getUser(user_id):
     print(user_id)
+    current_user_id=current_user.get_id()
     user = User.query.filter_by(id=user_id).first()
     if not user:
         print("why not found")
         abort(404)
+    following=user.followers.filter_by(follower_id=current_user_id).first()
+    if not following:
+        isFollowing=False
+    else:
+        isFollowing=True
     # image_file = url_for('static', filename='profile_pics/' + user.image_file)
     return make_response(jsonify({'user_id':user.id,'username': user.username, 'first_name': user.first_name, 'last_name': user.last_name,
                                   'gender': user.gender, 'birth_date': user.birth_date, 'email': user.email,
                                   'followers': len(user.followers.all()),
-                                  'followed': len(user.followed.all())}), 200)
+                                  'followed': len(user.followed.all()),'isfollowing': isFollowing}), 200)
 
 @app.route("/users/posts/<int:user_id>", methods=['GET'])
 @login_required
 def getUserPosts(user_id):
+    current_user_id = current_user.get_id()
     user = User.query.filter_by(id=user_id).first()
     if not user:
         abort(404)
     userPosts = user.travels
-    json_list = [i.to_json() for i in userPosts]
+    json_list = [i.to_json_with_sub_check(current_user_id) for i in userPosts]
     print(json_list)
     return make_response(jsonify(json_list),200)
 
@@ -256,6 +263,21 @@ def deletepost(post_id):
     post.delete(synchronize_session=False)
     db.session.commit()
     return 'done '
+
+@app.route("/user/postfeed", methods=['GET'])
+@login_required
+def getpostfeed():
+    user_id = current_user.get_id()
+    if not user_id:
+        abort(404)
+    user=User.query.filter_by(id=user_id).first()
+    userPosts=user.get_posts_as_list()
+    for i in user.followed.all():
+        userPosts.append(i.followed.get_posts_as_list())
+    print(userPosts)
+    return 'done '
+
+
 
 @app.route("/getall", methods=['GET'])
 def getall():
