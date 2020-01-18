@@ -11,25 +11,26 @@ class Subscribe(db.Model):
     id = db.Column(db.Integer, unique=True, primary_key=True)
     post_id = db.Column(db.Integer, db.ForeignKey('travel.id'))
     subscriber_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    notifications = db.relationship('Notification', backref='subscribe')
+    notifications = db.relationship('Notification', backref='subscribe', cascade='all, delete-orphan')
 
     def to_json(self):
-        json_travel={'post_id': self.post_id , 'subscriber_id':self.subscriber_id
-            , 'notifications' : [i.date_posted for i in self.notifications]}
-        return json_travel
+        json_sub = {'post_id': self.post_id, 'subscriber_id': self.subscriber_id
+            , 'notifications': [{'date': i.date_posted, 'id': i.id} for i in self.notifications]}
+        return json_sub
 
 
 class Notification(db.Model):
     id = db.Column(db.Integer, unique=True, primary_key=True)
     subscribe_id = db.Column(db.Integer, db.ForeignKey('subscribe.id'))
     date_posted = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-
-
+    def to_json(self):
+        json_notif = {'notif': self.post_id, 'subscriber_id': self.subscribe_id}
+        return json_notif
 
 
 class Follow(db.Model):
-    follower_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
-    followed_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
+    follower_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), primary_key=True)
+    followed_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), primary_key=True)
 
 
 class User(db.Model, UserMixin):
@@ -42,21 +43,25 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(60), nullable=False)
     image_file = db.Column(db.String(20))
-    travels = db.relationship('Travel', backref='traveler', lazy='dynamic')
+    travels = db.relationship('Travel', backref='traveler', lazy='dynamic', cascade='all, delete-orphan')
     followed = db.relationship('Follow', foreign_keys=[Follow.follower_id],
                                backref=db.backref('follower', lazy='joined'),
-                               lazy='dynamic', cascade='all, delete-orphan')
+                               lazy='dynamic', cascade='all, delete-orphan',passive_deletes=True)
     followers = db.relationship('Follow',
                                 foreign_keys=[Follow.followed_id],
                                 backref=db.backref('followed', lazy='joined'),
                                 lazy='dynamic',
-                                cascade='all, delete-orphan')
+                                cascade='all, delete-orphan',passive_deletes=True)
     subscribed_travels = db.relationship('Subscribe',
-                               backref=db.backref('subscriber', lazy='joined'),
-                               lazy='dynamic', cascade='all, delete-orphan')
+                                         backref=db.backref('subscriber', lazy='joined'),
+                                         lazy='dynamic', cascade='all, delete-orphan')
 
     def __repr__(self):
         return f"User('{self.username}', '{self.email}', '{self.image_file}')"
+
+    def to_json(self):
+        json_user = {'id': self.id, 'username': self.username}
+        return json_user
 
 
 class Travel(db.Model):
@@ -72,18 +77,16 @@ class Travel(db.Model):
     longitude = db.Column(db.Text, nullable=False)
     content = db.Column(db.Text, nullable=False)
     subscribed_users = db.relationship('Subscribe',
-                                         backref=db.backref('post', lazy='joined'),
-                                         lazy='dynamic', cascade='all, delete-orphan')
+                                       backref=db.backref('post', lazy='joined'),
+                                       lazy='dynamic', cascade='all, delete-orphan')
 
     def __repr__(self):
         return f"Travel('{self.date_posted}')"
 
     def to_json(self):
-        json_travel={'city': self.city, 'country': self.country,
-                      'content': self.content, 'title': self.title,'userid':self.user_id }
+        json_travel = {'city': self.city, 'country': self.country,
+                       'content': self.content, 'title': self.title, 'userid': self.user_id, 'id': self.id}
         return json_travel
-
-
 
 # db.drop_all()
 # db.create_all()

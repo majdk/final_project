@@ -157,10 +157,12 @@ def addPost():
 def follow(followed_user_id):
     user_id = current_user.get_id()
     if not user_id:
+        print("160")
         abort(404)
     user = User.query.filter_by(id=user_id).first()
     followed_user= User.query.filter_by(id=followed_user_id).first()
     if not user or not followed_user:
+        print(165)
         abort(404)
     follow_instance=Follow(follower_id=user_id,followed_id=followed_user_id)
     db.session.add(follow_instance)
@@ -183,7 +185,7 @@ def subscribe(post_id):
     subInstance=Subscribe(post_id=post_id,subscriber_id=user_id)
     user.subscribed_travels.append(subInstance)
     db.session.commit()
-    return 'done but not tested'
+    return 'done'
 
 @app.route("/user/edit/<int:post_id>", methods=['POST'])
 @login_required
@@ -191,22 +193,13 @@ def edit(post_id):
     data = request.get_json()
     user_id = current_user.get_id()
     if not user_id:
-        print("oh no 194")
         abort(404)
     user = User.query.filter_by(id=user_id).first()
     post= Travel.query.filter_by(id=post_id).first()
-    print("post id : ")
-    print(post_id)
-    print("post.user_id")
-    print(post.user_id)
-    print("user_id")
-    print(user_id)
     if not user or not post or int(post.user_id) != int(user_id):
-        print("oh no 202")
         abort(404)
     subscribe=Subscribe.query.filter_by(post_id=post_id).all()
     if not subscribe:
-        print("oh no 203")
         abort(404)
     newPost=createPost(data)
     post.title=newPost.title
@@ -221,7 +214,7 @@ def edit(post_id):
         notification = Notification(subscribe_id=i.id)
         i.notifications.append(notification)
     db.session.commit()
-    return 'done but not tested'
+    return 'done '
 
 @app.route("/user/notifications", methods=['GET'])
 @login_required
@@ -236,6 +229,47 @@ def getNotifications():
     json_list = [i.to_json() for i in subscribed_travels]
     print(json_list)
     return make_response(jsonify(json_list),200)
+
+@app.route("/user/deleteaccount", methods=['GET'])
+@login_required
+def deleteAccount():
+    user_id = current_user.get_id()
+    if not user_id:
+        abort(404)
+    user = User.query.filter_by(id=user_id)
+    if not user:
+        abort(404)
+    user.delete(synchronize_session=False)
+    db.session.commit()
+    logout_user()
+    return 'deleted but not tested yet'
+
+@app.route("/user/deletepost/<int:post_id>", methods=['POST'])
+@login_required
+def deletepost(post_id):
+    user_id = current_user.get_id()
+    if not user_id:
+        abort(404)
+    post= Travel.query.filter_by(id=post_id)
+    if not post:
+        abort(404)
+    post.delete(synchronize_session=False)
+    db.session.commit()
+    return 'done '
+
+@app.route("/getall", methods=['GET'])
+def getall():
+    users=User.query.all()
+    travels=Travel.query.all()
+    subscribes=Subscribe.query.all()
+    for i in users:
+        print(i.to_json())
+    for i in travels:
+        print(i.to_json())
+    for i in subscribes:
+        print(i.to_json())
+    return 'done '
+
 
 def createPost(data):
 
