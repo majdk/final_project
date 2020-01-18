@@ -7,7 +7,7 @@ import SignUp from './Signup'
 import SimpleExample from "./DiscoverMap";
 import Profile from "./Profile";
 import HomePage from "./HomePage";
-import { Switch } from "react-router-dom";
+// import { Switch } from "react-router-dom";
 
 import { Redirect } from "react-router-dom";
 import { withStyles } from "@material-ui/core/styles";

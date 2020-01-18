@@ -1,8 +1,9 @@
-import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import React, {Component} from "react";
+import { withStyles} from "@material-ui/core/styles";
 import Post from "./Post";
 
-const useStyles = makeStyles(theme => ({
+
+const styles = theme => ({
   root: {
     display: "flex",
     // alignItems: "center",
@@ -14,21 +15,35 @@ const useStyles = makeStyles(theme => ({
     // marginRight: 100,
     marginBottom: 50
   }
-}));
+});
 
-export default function PostsFeed() {
-  const classes = useStyles();
+class PostsFeed extends Component {
+  constructor() {
+    super()
+    console.log('Constructor');
+  }
+  componentDidMount() {
+    console.log('Mounting');
+  }
 
-  return (
-    <div className={classes.root}>
-      <Post />
-      <Post />
-      <Post />
-      <Post />
-      <Post />
-      <Post />
-      <Post />
-      <Post />
-    </div>
-  );
+  render() {
+    const { classes } = this.props;
+    return (
+      <div className={classes.root}>
+      {this.props.posts.map((post) =>
+          <Post post={post} key={post.title} />
+      )}
+        {/*<Post />*/}
+        {/*<Post />*/}
+        {/*<Post />*/}
+        {/*<Post />*/}
+        {/*<Post />*/}
+        {/*<Post />*/}
+        {/*<Post />*/}
+        {/*<Post />*/}
+      </div>
+    )
+  }
 }
+
+export default withStyles(styles)(PostsFeed)

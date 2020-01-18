@@ -88,7 +88,7 @@ class SignUp extends Component {
             lastname: this.state.lastname,
         }
         signup(user).then(res => {
-            if (res != 'error') {
+            if (res !== 'error') {
                 this.props.history.push(`/login`)
             }
             else {

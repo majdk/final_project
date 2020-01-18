@@ -95,7 +95,7 @@ class SignIn extends Component {
       password: this.state.password
     }
     login(user).then(res => {
-      if (res != 'error') {
+      if (res !== 'error') {
         this.props.history.push(`/`)
       }
       else {

@@ -11,6 +11,7 @@ import CardActions from "@material-ui/core/CardActions";
 import AddAlertIcon from "@material-ui/icons/AddAlert";
 import NotificationsOffIcon from "@material-ui/icons/NotificationsOff";
 import DeleteIcon from "@material-ui/icons/Delete";
+import dayjs from 'dayjs'
 
 const MyCardHeader = withStyles({
   avatar: {
@@ -71,7 +72,7 @@ const useStyles = makeStyles(theme => ({
 let my_post = true;
 let notification_on = true;
 
-export default function PostsFeed() {
+export default function Post(props) {
   const classes = useStyles();
   return (
     <div className={classes.post_wrapper}>
@@ -104,16 +105,12 @@ export default function PostsFeed() {
               )}
             </div>
           }
-          title="Shrimp and Chorizo Paella"
-          subheader="September 14, 2016 - September 14, 2016"
+          title={props.post.title}
+          subheader={dayjs(props.post.start_date).format("YYYY-MM-DD") + " - " + dayjs(props.post.end_date).format("YYYY-MM-DD")}
         />
         <CardContent>
           <Typography variant="body2" color="textSecondary" component="p">
-            This impressive paella is a perfect party dish and a fun meal to
-            cook together with your guests. Add 1 cup of frozen peas along with
-            the mussels, if you like. This impressive paella is a perfect party
-            dish and a fun meal to cook together with your guests. Add 1 cup of
-            frozen peas along with the mussels, if you like.
+            {props.post.content}
           </Typography>
         </CardContent>
         {my_post && (
