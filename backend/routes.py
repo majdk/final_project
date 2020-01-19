@@ -177,6 +177,27 @@ def follow(followed_user_id):
     return make_response(jsonify({'myuserfollowList':len(user.followed.all()),'theotheruserfollowersList:':len(followed_user.followers.all())
                                   ,'myuserfollowersList':len(user.followers.all()),'theuseruserfollowList:':len(followed_user.followed.all())}), 200)
 
+
+@app.route("/user/unfollow/<int:followed_user_id>", methods=['POST'])
+@login_required
+def unfollow(followed_user_id):
+    user_id = current_user.get_id()
+    if not user_id:
+        abort(404)
+    user = User.query.filter_by(id=user_id).first()
+    followed_user= User.query.filter_by(id=followed_user_id).first()
+    if not user or not followed_user:
+        abort(404)
+
+    follow_instance=Follow(follower_id=user_id,followed_id=followed_user_id)
+    db.session.add(follow_instance)
+    db.session.commit()
+    user = User.query.filter_by(id=user_id).first()
+    followed_user = User.query.filter_by(id=followed_user_id).first()
+    return make_response(jsonify({'myuserfollowList':len(user.followed.all()),'theotheruserfollowersList:':len(followed_user.followers.all())
+                                  ,'myuserfollowersList':len(user.followers.all()),'theuseruserfollowList:':len(followed_user.followed.all())}), 200)
+
+
 @app.route("/user/subscribe/<int:post_id>", methods=['POST'])
 @login_required
 def subscribe(post_id):
@@ -271,7 +292,7 @@ def getpostfeed():
     user=User.query.filter_by(id=user_id).first()
     userPosts=user.get_posts_as_list()
     for i in user.followed.all():
-        userPosts.append(i.followed.get_posts_as_list())
+       userPosts= userPosts + i.followed.get_posts_as_list()
 
     return make_response(jsonify(userPosts),200)
 
