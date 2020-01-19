@@ -48,8 +48,6 @@ def register():
         abort(403)
     data=request.form['user']
     data=json.loads(data)
-    print(data)
-    print(request.files)
     if not data or not 'password' in data or not 'username' in data or not 'firstname' in data \
             or not 'lastname' in data or not 'email' in data or not 'bio' in data:
         abort(400)
@@ -110,7 +108,8 @@ def editprofile():
     user = User.query.filter_by(id=user_id).first()
     if not user:
         abort(404)
-    user_data = request.get_json()
+    user_data = request.form['user']
+    user_data = json.loads(user_data)
     if 'id' in user_data or 'username' in user_data or 'email' in user_data:
         abort(400)
     if 'file' not in request.files:
