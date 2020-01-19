@@ -23,7 +23,7 @@ class PostsFeed extends Component {
     // console.log('Constructor');
   }
   componentDidMount() {
-    // console.log(this.props)
+    console.log(this.props.posts)
     // console.log('Mounting');
   }
 

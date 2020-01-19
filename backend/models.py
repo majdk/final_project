@@ -120,7 +120,9 @@ class Travel(db.Model):
                        'end_date':self.end_date,
                        'date_posted':self.date_posted,
                        'latitude': self.latitude,
-                       'longitude':self.longitude}
+                       'longitude':self.longitude,
+                       'username': self.traveler.username,
+                       'profile_pic': self.traveler.image_file}
         return json_travel
 
     def to_json_with_sub_check(self,checkusersub):
@@ -134,7 +136,9 @@ class Travel(db.Model):
                        ,'start_date':self.start_date,'end_date':self.end_date,
                        'date_posted':self.date_posted,
                        'latitude': self.latitude,
-                       'longitude': self.longitude
+                       'longitude': self.longitude,
+                       'username': self.traveler.username,
+                       'profile_pic': self.traveler.image_file
                        }
         return json_travel
 

@@ -87,10 +87,19 @@ class Post extends Component {
     super()
     this.state = {
       edit_post_open: false,
+      post: {
+        title: '',
+        start_date: new Date(),
+        end_date: new Date(),
+        content: '',
+      }
     }
     // console.log('Constructor');
   }
   componentDidMount() {
+    this.setState({
+      post: this.props.post,
+    })
     // console.log(this.props)
     // console.log('Mounting');
   }
@@ -113,6 +122,9 @@ class Post extends Component {
       editPost(this.props.post.id, post).then(res => {
         console.log(post)
         if (res !== 'error') {
+          this.setState({
+            post: post,
+          })
           // this.setState({
           //   posts_feed: [...this.state.posts_feed, post]
           // })
@@ -140,13 +152,12 @@ class Post extends Component {
                 <Avatar
                     aria-label="recipe"
                     className={classes.avatar}
-                    src="/static/images/zidane.jpg"
+                    src={"/static/images/" + this.props.post.profile_pic}
                 >
                   R
                 </Avatar>
               }
-              title="majdk"
-              subheader="Majd Khalil"
+              title={this.props.post.username}
           />
           <Card variant="outlined" className={classes.post}>
             <CardHeader
@@ -163,12 +174,12 @@ class Post extends Component {
                     )}
                   </div>
                 }
-                title={this.props.post.title}
-                subheader={dayjs(this.props.post.start_date).format("YYYY-MM-DD") + " - " + dayjs(this.props.post.end_date).format("YYYY-MM-DD")}
+                title={this.state.post.title}
+                subheader={dayjs(this.state.post.start_date).format("YYYY-MM-DD") + " - " + dayjs(this.state.post.end_date).format("YYYY-MM-DD")}
             />
             <CardContent>
               <Typography variant="body2" color="textSecondary" component="p">
-                {this.props.post.content}
+                {this.state.post.content}
               </Typography>
             </CardContent>
             {my_post && (
