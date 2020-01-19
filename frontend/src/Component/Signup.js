@@ -231,7 +231,6 @@ class SignUp extends Component {
                             <div>
                                 <input ref={(ref) => { this.uploadInput = ref; }} type="file" />
                             </div>
-                            <img src={this.state.imageURL} alt="img" />
                             {/*<div>*/}
                             {/*    <input ref={(ref) => { this.fileName = ref; }} type="text" placeholder="Enter the desired name of file" />*/}
                             {/*</div>*/}

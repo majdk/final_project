@@ -177,7 +177,7 @@ class HomePage extends Component {
       addPost(post).then(res => {
         if (res !== 'error') {
           this.setState({
-            posts_feed: [...this.state.posts_feed, post]
+            posts_feed: [...this.state.posts_feed, res]
           })
         } else {
 

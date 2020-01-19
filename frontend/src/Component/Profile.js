@@ -11,6 +11,7 @@ import Box from '@material-ui/core/Box';
 import jwt_decode from "jwt-decode";
 import axios from "axios";
 import {getPostsFeed} from "./HomePage";
+import FollowList from "./FollowList";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -92,6 +93,9 @@ const styles = theme => ({
   tabsBar: {
     backgroundColor: "#fafafa"
   },
+  // tabs: {
+  //   alignCenter: "true",
+  // },
   follow_line: {
     display: "flex",
   },
@@ -158,6 +162,33 @@ export const unfollowUser = user_id => {
       })
 }
 
+
+export const getFollowers = user_id => {
+  axios.defaults.withCredentials = true;
+  return axios
+      .get('http://127.0.0.1:5000/user/followers')
+      .then(response => {
+        return response.data
+      })
+      .catch(err => {
+        console.log(err)
+        return 'error'
+      })
+}
+
+export const getFollowing = user_id => {
+  axios.defaults.withCredentials = true;
+  return axios
+      .get('http://127.0.0.1:5000/user/following')
+      .then(response => {
+        return response.data
+      })
+      .catch(err => {
+        console.log(err)
+        return 'error'
+      })
+}
+
 class Profile extends Component {
   constructor() {
     super();
@@ -167,6 +198,8 @@ class Profile extends Component {
       user_info: [],
       my_profile: true,
       is_followed: false,
+      followers: [],
+      following: [],
     }
     // console.log('Constructor');
     this.onFollow = this.onFollow.bind(this)
@@ -221,7 +254,7 @@ class Profile extends Component {
           user_info: res,
           is_followed: res.isfollowing,
         })
-        console.log("../../backend/static/profile_pics/" + this.state.user_info.image)
+        console.log(res)
         // console.log(res);
       } else {
 
@@ -233,6 +266,28 @@ class Profile extends Component {
         // console.log(res)
         this.setState({
           posts: res
+        })
+      } else {
+
+      }
+    });
+    getFollowers(user_id).then(res => {
+      if (res !== 'error') {
+        console.log('My followers:')
+        console.log(res)
+        this.setState({
+          followers: res
+        })
+      } else {
+
+      }
+    });
+    getFollowing(user_id).then(res => {
+      if (res !== 'error') {
+        console.log('My following:')
+        console.log(res)
+        this.setState({
+          following: res
         })
       } else {
 
@@ -265,9 +320,7 @@ class Profile extends Component {
 
                 </div>
                 <Typography variant="subtitle2">{this.state.user_info.first_name + " " + this.state.user_info.last_name}</Typography>
-                <Typography variant="body2">This impressive paella is a perfect party dish and a fun meal to
-                  cook together with your guests. Add 1 cup of frozen peas along with
-                  the mussels, if you like. </Typography>
+                <Typography variant="body2"> {this.state.user_info.bio} </Typography>
                 <div className={classes.followers}>
 
                   <Typography variant="subtitle2" className={classes.followButton}>{this.state.user_info.followers} followers</Typography>
@@ -296,7 +349,10 @@ class Profile extends Component {
                 <PostsFeed posts={this.state.posts}/>
               </TabPanel>
               <TabPanel value={this.state.tab_index} index={1}>
-                Item Two
+               <FollowList list={this.state.followers} />
+              </TabPanel>
+              <TabPanel value={this.state.tab_index} index={2}>
+                <FollowList list={this.state.following} />
               </TabPanel>
             </AppBar>)
             }

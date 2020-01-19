@@ -31,7 +31,7 @@ class PostsFeed extends Component {
     const { classes } = this.props;
     return (
       <div className={classes.root}>
-      {this.props.posts.map((post) =>
+      {this.props.posts.slice(0).reverse().map((post) =>
           <Post post={post} key={post.id} />
       )}
         {/*<Post />*/}

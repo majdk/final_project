@@ -149,13 +149,15 @@ class Post extends Component {
           <MyCardHeader
               className={classes.user_details}
               avatar={
-                <Avatar
-                    aria-label="recipe"
-                    className={classes.avatar}
-                    src={"/static/images/" + this.props.post.profile_pic}
-                >
-                  R
-                </Avatar>
+                <a href={"/profile/" + this.props.post.userid}>
+                  <Avatar
+                      aria-label="recipe"
+                      className={classes.avatar}
+                      src={"/static/images/" + this.props.post.profile_pic}
+                  >
+                    R
+                  </Avatar>
+                </a>
               }
               title={this.props.post.username}
           />
