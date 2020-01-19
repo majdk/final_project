@@ -16,6 +16,7 @@ import {
 } from '@material-ui/pickers';
 import axios from "axios";
 import jwt_decode from "jwt-decode";
+import PostDialog from "./PostDialog";
 
 
 const useStyles = theme => ({
@@ -116,14 +117,14 @@ class HomePage extends Component {
     super()
     this.state = {
       add_post_open: false,
-      start_date: new Date('2014-08-18T21:11:54'),
-      end_date: new Date('2014-08-18T21:11:54'),
-      post_title: '',
-      post_content: '',
+      // start_date: new Date('2014-08-18T21:11:54'),
+      // end_date: new Date('2014-08-18T21:11:54'),
+      // post_title: '',
+      // post_content: '',
       posts_feed: [],
     };
     // console.log('asdasdsa')
-    this.onChange = this.onChange.bind(this)
+    // this.onChange = this.onChange.bind(this)
     // this.onSubmit = this.onSubmit.bind(this)
   }
 
@@ -140,34 +141,34 @@ class HomePage extends Component {
     })
   }
 
-  onChange(e) {
-    this.setState({ [e.target.name]: e.target.value });
-    e.preventDefault();
-    // console.log('asdasdsa');
-  }
+  // onChange(e) {
+  //   this.setState({ [e.target.name]: e.target.value });
+  //   e.preventDefault();
+  //   // console.log('asdasdsa');
+  // }
 
-  handleDateChangeStart = date => {
-    this.setState({ start_date: date });
-    // setSelectedDateStart(date);
-  };
-  handleDateChangeEnd = date => {
-    this.setState({ end_date: date });
-    // setSelectedDateEnd(date);
-  };
+  // handleDateChangeStart = date => {
+  //   this.setState({ start_date: date });
+  //   // setSelectedDateStart(date);
+  // };
+  // handleDateChangeEnd = date => {
+  //   this.setState({ end_date: date });
+  //   // setSelectedDateEnd(date);
+  // };
 
   handleClickOpen = () => {
     this.setState({ add_post_open: true });
   };
 
-  handleClose = (submit) => {
-    const post = {
-      title: this.state.post_title,
-      start_date: this.state.start_date,
-      end_date: this.state.end_date,
-      latitude: '38.8976989',
-      longitude: '-77.036553192281',
-      content: this.state.post_content,
-    }
+  handleClose = (submit, post) => {
+    // const post = {
+    //   title: this.state.post_title,
+    //   start_date: this.state.start_date,
+    //   end_date: this.state.end_date,
+    //   latitude: '38.8976989',
+    //   longitude: '-77.036553192281',
+    //   content: this.state.post_content,
+    // }
     console.log(post);
     if (submit) {
       // TODO: check for errors.
@@ -195,74 +196,12 @@ class HomePage extends Component {
               <Button variant="outlined" color="primary" onClick={this.handleClickOpen} >
                 ADD POST
               </Button>
-              <Dialog open={this.state.add_post_open} onClose={() => {this.handleClose(false)}} aria-labelledby="form-dialog-title">
-                <DialogTitle id="form-dialog-title">Add a Post</DialogTitle>
-                <DialogContent>
-                  {/*<DialogContentText>*/}
-                  {/*  To subscribe to this website, please enter your email address here. We will send updates*/}
-                  {/*  occasionally.*/}
-                  {/*</DialogContentText>*/}
-                  <TextField
-                      autoFocus
-                      margin="dense"
-                      id="title"
-                      label="Title"
-                      type="email"
-                      name="post_title"
-                      fullWidth
-                      onChange={this.onChange}
-                  />
-                  <TextField
-                      autoFocus
-                      margin="dense"
-                      id="desc"
-                      label="Description"
-                      type="email"
-                      name="post_content"
-                      fullWidth
-                      multiline
-                      onChange={this.onChange}
-                  />
-                  <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                    <KeyboardDatePicker
-                        disableToolbar
-                        variant="inline"
-                        format="MM/dd/yyyy"
-                        margin="normal"
-                        id="date-picker-inline"
-                        label="Start date"
-                        value={this.state.start_date}
-                        onChange={this.handleDateChangeStart}
-                        KeyboardButtonProps={{
-                          'aria-label': 'change date',
-                        }}
-                    />
-                    <KeyboardDatePicker
-                        disableToolbar
-                        variant="inline"
-                        format="MM/dd/yyyy"
-                        margin="normal"
-                        id="date-picker-inline"
-                        label="End date"
-                        value={this.state.end_date}
-                        onChange={this.handleDateChangeEnd}
-                        KeyboardButtonProps={{
-                          'aria-label': 'change date',
-                        }}
-                    />
-                  </MuiPickersUtilsProvider>
-                </DialogContent>
-                <DialogActions>
-                  <Button onClick={() => this.handleClose(false)} color="primary">
-                    Cancel
-                  </Button>
-                  <Button onClick={() => this.handleClose(true)} color="primary">
-                    ADD
-                  </Button>
-                </DialogActions>
-              </Dialog>
+              <PostDialog
+                open={this.state.add_post_open}
+                handleClose={this.handleClose.bind(this)}
+              />
             </div>
-            <PostsFeed posts={this.state.posts_feed} my_profile={this.state.my_profile} />
+            <PostsFeed posts={this.state.posts_feed} />
           </Grid>
           <Grid item sm={2} xs={12} />
         </Grid>

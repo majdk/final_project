@@ -230,7 +230,7 @@ class Profile extends Component {
                 <Tab label="Info" {...a11yProps(3)} />
               </Tabs>
               <TabPanel value={this.state.tab_index} index={0}>
-                <PostsFeed posts={this.state.posts} my_profile={this.state.my_profile}/>
+                <PostsFeed posts={this.state.posts} />
               </TabPanel>
               <TabPanel value={this.state.tab_index} index={1}>
                 Item Two
