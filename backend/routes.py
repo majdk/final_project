@@ -12,10 +12,12 @@ from geopy import distance
 
 def save_picture(form_picture):
     random_hex = secrets.token_hex(8)
+    print("its me 15")
     _, f_ext = os.path.splitext(form_picture.filename)
     picture_fn = random_hex + f_ext
+    print("its me 18")
     picture_path = os.path.join(app.root_path, 'static/profile_pics', picture_fn)
-
+    print("its me 20")
     output_size = (125, 125)
     i = Image.open(form_picture)
     i.thumbnail(output_size)
@@ -69,6 +71,15 @@ def register():
     db.session.add(user)
     db.session.commit()
     return 'Created'
+
+@app.route("/user/savepic", methods=['POST'])
+def savepic():
+    print("hello")
+    print(request.files)
+    file = request.files['file']
+    print("its me")
+    picture_saved_name=save_picture(file)
+    return picture_saved_name
 
 
 @app.route("/login", methods=['GET', 'POST'])
@@ -408,7 +419,7 @@ def search_on_map():
         if distance_from_center <= float(km):
             travels_within_radius.append(i.to_json())
     print(travels_within_radius)
-    make_response(jsonify(travels_within_radius), 200)
+    return make_response(jsonify(travels_within_radius), 200)
 
 
 @app.route("/getall", methods=['GET'])
