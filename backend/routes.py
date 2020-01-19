@@ -155,8 +155,7 @@ def addPost():
     travel=createPost(data)
     user.travels.append(travel)
     db.session.commit()
-    newTravel=Travel.query.filter_by(city=travel.city).first() # for testing purpose
-    return make_response(jsonify({'userid':newTravel.user_id,'the_user:':user_id}), 200)
+    return make_response(jsonify(travel.to_json()), 200)
 
 @app.route("/user/follow/<int:followed_user_id>", methods=['POST'])
 @login_required
