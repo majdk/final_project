@@ -132,6 +132,32 @@ export const getUserInfo = user_id => {
       })
 }
 
+export const followUser = user_id => {
+  axios.defaults.withCredentials = true;
+  return axios
+      .post('http://127.0.0.1:5000/user/follow/' + user_id)
+      .then(response => {
+        return response.data
+      })
+      .catch(err => {
+        console.log(err)
+        return 'error'
+      })
+}
+
+export const unfollowUser = user_id => {
+  axios.defaults.withCredentials = true;
+  return axios
+      .post('http://127.0.0.1:5000/user/unfollow/' + user_id)
+      .then(response => {
+        return response.data
+      })
+      .catch(err => {
+        console.log(err)
+        return 'error'
+      })
+}
+
 class Profile extends Component {
   constructor() {
     super();
@@ -142,13 +168,40 @@ class Profile extends Component {
       my_profile: true,
       is_followed: false,
     }
-    console.log('Constructor');
-    // this.onFollow = this.onFollow.bind(this)
+    // console.log('Constructor');
+    this.onFollow = this.onFollow.bind(this)
   }
 
   handleChange = (event, newValue) => {
     this.setState({tab_index: newValue});
-  };
+  }
+
+  onFollow() {
+    let user_id = this.props.match.params.id;
+    if (!this.state.is_followed) {
+      followUser(user_id).then(res => {
+        if (res !== 'error') {
+          this.setState({
+            is_followed: true
+          })
+          // console.log(res);
+        } else {
+
+        }
+      })
+    } else {
+      unfollowUser(user_id).then(res => {
+        if (res !== 'error') {
+          this.setState({
+            is_followed: false
+          })
+          // console.log(res);
+        } else {
+
+        }
+      })
+    }
+  }
 
   componentDidMount() {
     let user_id = this.props.match.params.id;
@@ -160,20 +213,23 @@ class Profile extends Component {
     let curr_user = decoded.identity.id;
     if (!user_id)
       user_id = curr_user;
-    console.log(user_id, curr_user)
+    // console.log(user_id, curr_user)
     this.setState({my_profile: (curr_user == user_id)})
     getUserInfo(user_id).then(res => {
       if (res !== 'error') {
         this.setState({
-          user_info: res
+          user_info: res,
+          is_followed: res.isfollowing,
         })
-        console.log(res);
+        // console.log(res);
       } else {
 
       }
     })
     getPosts(user_id).then(res => {
       if (res !== 'error') {
+        // console.log('My posts:')
+        // console.log(res)
         this.setState({
           posts: res
         })
@@ -196,7 +252,12 @@ class Profile extends Component {
                 <div className={classes.follow_line}>
                   <Typography variant="h4" className={classes.userName}>{this.state.user_info.username}</Typography>
                   {!this.state.my_profile &&
-                  (<Button className={classes.follow_btn} variant="contained" color={this.state.is_followed ? "default" : "primary"}>
+                  (<Button
+                      className={classes.follow_btn}
+                      variant="contained"
+                      color={this.state.is_followed ? "default" : "primary"}
+                      onClick={this.onFollow}
+                  >
                         {this.state.is_followed ? "Unfollow" : "Follow"}
                   </Button>)
                   }
@@ -214,7 +275,8 @@ class Profile extends Component {
               </div>
 
             </div>
-            <AppBar position="static" color="default" elevation="0" className={classes.tabsBar}>
+            {(this.state.is_followed || this.state.my_profile) &&
+            (<AppBar position="static" color="default" elevation="0" className={classes.tabsBar}>
               <Tabs
                   value={this.state.tab_index}
                   onChange={this.handleChange}
@@ -230,12 +292,13 @@ class Profile extends Component {
                 <Tab label="Info" {...a11yProps(3)} />
               </Tabs>
               <TabPanel value={this.state.tab_index} index={0}>
-                <PostsFeed posts={this.state.posts} />
+                <PostsFeed posts={this.state.posts}/>
               </TabPanel>
               <TabPanel value={this.state.tab_index} index={1}>
                 Item Two
               </TabPanel>
-            </AppBar>
+            </AppBar>)
+            }
 
           </Grid>
           <Grid item sm={2} xs={12} />

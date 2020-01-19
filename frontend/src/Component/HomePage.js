@@ -63,7 +63,7 @@ export const getPostsFeed = post => {
   let user_id = decoded.identity.id;
   axios.defaults.withCredentials = true;
   return axios
-      .get('http://127.0.0.1:5000/users/posts/' + user_id)
+      .get('http://127.0.0.1:5000/user/postfeed')
       .then(response => {
         return response.data
       })
@@ -132,6 +132,8 @@ class HomePage extends Component {
     // TODO: Check errors.
     getPostsFeed().then(res => {
       if (res !== 'error') {
+        // console.log('POSTS:')
+        // console.log(res);
         this.setState({
           posts_feed: res
         })

@@ -8,7 +8,7 @@ import SimpleExample from "./DiscoverMap";
 import Profile from "./Profile";
 import HomePage from "./HomePage";
 // import { Switch } from "react-router-dom";
-
+import { createBrowserHistory } from "history";
 import { Redirect } from "react-router-dom";
 import { withStyles } from "@material-ui/core/styles";
 import jwt_decode from "jwt-decode";
@@ -38,14 +38,26 @@ function isLoggedIn() {
 }
 
 
-
 class App extends Component {
   constructor() {
     super();
     this.state = {
       signed_in_user: '',
+      // changeUser: this.changeUser,
     }
   }
+
+  // changeUser() {
+  //   const token = localStorage.usertoken;
+  //   var decoded=0;
+  //   if (token) {
+  //     decoded = jwt_decode(token);
+  //     let curr_user = decoded.identity.id;
+  //     this.setState({signed_in_user: curr_user});
+  //     console.log('Updated user')
+  //   }
+  // };
+
   componentDidMount() {
     const token = localStorage.usertoken;
     var decoded=0;
@@ -53,15 +65,33 @@ class App extends Component {
       decoded = jwt_decode(token);
       let curr_user = decoded.identity.id;
       this.setState({signed_in_user: curr_user});
+      console.log('Updated user')
     }
 
   }
+
+  // componentDidUpdate(prevProps, prevState, snapshot) {
+  //   // console.log('Apdated app...')
+  //   const token = localStorage.usertoken;
+  //   var decoded=0;
+  //   if (token) {
+  //     decoded = jwt_decode(token);
+  //   }
+  //   let curr_user = decoded.identity.id;
+  //   if (prevState.signed_in_user !== curr_user) {
+  //     this.setState({signed_in_user: curr_user});
+  //   }
+  // }
 
   render() {
     const { classes } = this.props;
     return (
       <div className={classes.root}>
-        <UserContext.Provider value={this.state.signed_in_user}>
+        <UserContext.Provider
+            value={{
+              name: this.state.signed_in_user
+            }}
+        >
           <Router>
               <PrimarySearchAppBar />
               <Route exact path="/" render={(props) => (
@@ -86,7 +116,7 @@ class App extends Component {
                 )}/>
                 <Route exact path="/profile/:id" render={(props) => (
                     !isLoggedIn() ? (
-                        <Redirect to="/login"/>) : (<Profile {...props} />)
+                        <Redirect to="/login"/>) : (<Profile key={props.match.params.id} {...props} />)
                 )}/>
           </Router>
         </UserContext.Provider>

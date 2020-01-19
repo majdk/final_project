@@ -17,80 +17,11 @@ import { withStyles } from "@material-ui/core/styles";
 import Link from "react-router-dom/Link";
 import axios from "axios";
 import { withRouter } from 'react-router-dom';
-
-// const useStyles = makeStyles(theme => ({
-//   grow: {
-//     flexGrow: 1
-//   },
-//   menuButton: {
-//     marginRight: theme.spacing(2)
-//   },
-//   title: {
-//     display: "none",
-//     [theme.breakpoints.up("sm")]: {
-//       display: "block"
-//     }
-//   },
-//   search: {
-//     position: "relative",
-//     borderRadius: theme.shape.borderRadius,
-//     backgroundColor: fade(theme.palette.common.white, 0.15),
-//     "&:hover": {
-//       backgroundColor: fade(theme.palette.common.white, 0.25)
-//     },
-//     marginRight: theme.spacing(2),
-//     marginLeft: 0,
-//     width: "100%",
-//     [theme.breakpoints.up("sm")]: {
-//       marginLeft: theme.spacing(3),
-//       width: "auto"
-//     }
-//   },
-//   searchIcon: {
-//     width: theme.spacing(7),
-//     height: "100%",
-//     position: "absolute",
-//     pointerEvents: "none",
-//     display: "flex",
-//     alignItems: "center",
-//     justifyContent: "center"
-//   },
-//   inputRoot: {
-//     color: "inherit"
-//   },
-//   inputInput: {
-//     padding: theme.spacing(1, 1, 1, 7),
-//     transition: theme.transitions.create("width"),
-//     width: "100%",
-//     [theme.breakpoints.up("md")]: {
-//       width: 200
-//     }
-//   },
-//   sectionDesktop: {
-//     display: "none",
-//     [theme.breakpoints.up("md")]: {
-//       display: "flex"
-//     }
-//   },
-//   sectionMobile: {
-//     display: "flex",
-//     [theme.breakpoints.up("md")]: {
-//       display: "none"
-//     }
-//   },
-//   appBar: {
-//     zIndex: theme.zIndex.drawer + 1
-//   },
-//   dropdown: {
-//     margin: theme.spacing(1),
-//     width: theme.spacing(40),
-//     height: theme.spacing(60),
-//     position: "absolute",
-//     top: "45px",
-//     right: "60px"
-//   },
-//   toolbar: theme.mixins.toolbar
-// }));
+import InputAdornment from '@material-ui/core/InputAdornment';
+import {addPost} from "./HomePage";
+import Snackbar from '@material-ui/core/Snackbar';
+import MuiAlert from '@material-ui/lab/Alert';
+import { makeStyles } from '@material-ui/core/styles';
 
 const styles = theme => ({
   grow: {
@@ -170,14 +101,61 @@ const styles = theme => ({
   toolbar: theme.mixins.toolbar
 });
 
+export const searchUser = username => {
+  axios.defaults.withCredentials = true;
+  return axios
+      .get('http://127.0.0.1:5000/user/searchuser/' + username)
+      .then(response => {
+        return response.data
+      })
+      .catch(err => {
+        console.log(err)
+        return 'error'
+      })
+}
+
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
+
 class PrimarySearchAppBar extends React.Component {
   constructor() {
     super();
     this.state = {
-      show_notifications: false
+      show_notifications: false,
+      search_term: '',
+      user_not_found: false
     };
     this.setWrapperRef = this.setWrapperRef.bind(this);
     this.handleClickOutside = this.handleClickOutside.bind(this);
+    this.onChangeSearch = this.onChangeSearch.bind(this);
+    this.onSearch = this.onSearch.bind(this);
+    this.onCloseUserNotFound = this.onCloseUserNotFound.bind(this);
+  }
+
+  onChangeSearch(e) {
+    this.setState({
+      search_term: e.target.value
+    })
+  }
+
+  onSearch() {
+    searchUser(this.state.search_term).then(res => {
+      if (res !== 'error') {
+        this.props.history.push("/profile/" + res)
+      } else {
+        this.setState({
+          user_not_found: true,
+        })
+      }
+    })
+
+  }
+
+  onCloseUserNotFound() {
+    this.setState({
+      user_not_found: false,
+    })
   }
 
   logOut(e) {
@@ -193,10 +171,16 @@ class PrimarySearchAppBar extends React.Component {
   }
 
   componentDidMount() {
+    // console.log('Component is mounting')
     document.addEventListener("mousedown", this.handleClickOutside);
   }
 
+  componentDidUpdate() {
+    // console.log('Component is updating')
+  }
+
   componentWillUnmount() {
+    // console.log('Component is unmounting')
     document.removeEventListener("mousedown", this.handleClickOutside);
   }
   /**
@@ -244,17 +228,35 @@ class PrimarySearchAppBar extends React.Component {
               Material-UI
             </Typography>
             <div className={classes.search}>
-              <div className={classes.searchIcon}>
-                <SearchIcon />
-              </div>
+              {/*<div className={classes.searchIcon}>*/}
+              {/*  <SearchIcon />*/}
+              {/*</div>*/}
               <InputBase
                 placeholder="Search…"
                 classes={{
                   root: classes.inputRoot,
                   input: classes.inputInput
                 }}
-                inputProps={{ "aria-label": "search" }}
+                onChange={this.onChangeSearch}
+                // inputProps={{ "aria-label": "search" }}
+                endAdornment={
+                  (
+                    <InputAdornment position="start">
+                      <IconButton
+                          color="inherit"
+                          style={{ backgroundColor: 'transparent' }}
+                          onClick={this.onSearch}
+                      >
+                        <SearchIcon  />
+                      </IconButton>
+                    </InputAdornment>
+                  )
+                }
               />
+
+              {/*<IconButton className={classes.searchIcon}>*/}
+              {/*  <SearchIcon />*/}
+              {/*</IconButton>*/}
             </div>
             <div className={classes.grow} />
             <div className={classes.sectionDesktop}>
@@ -303,6 +305,11 @@ class PrimarySearchAppBar extends React.Component {
             </div>
           </Toolbar>
         </AppBar>
+        <Snackbar open={this.state.user_not_found} autoHideDuration={3000} onClose={this.onCloseUserNotFound}>
+          <Alert severity="error" onClose={this.onCloseUserNotFound}>
+            User not found
+          </Alert>
+        </Snackbar>
       </div>
     );
   }

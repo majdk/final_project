@@ -70,7 +70,12 @@ class SimpleExample extends React.Component {
             A pretty CSS3 popup. <br /> Easily customizable.
           </Popup>
         </Marker>
-        <Control position="topleft">
+        <Control position="bottomleft">
+          <Button variant="contained" color="primary">
+            Search
+          </Button>
+        </Control>
+        <Control position="bottomleft">
           <FormControl
             className={clsx(classes.margin, classes.textField)}
             variant="outlined"
@@ -90,11 +95,7 @@ class SimpleExample extends React.Component {
             </FormHelperText>
           </FormControl>
         </Control>
-        <Control position="topleft">
-          <Button variant="contained" color="primary">
-            Search
-          </Button>
-        </Control>
+
         {/* <SearchLeaflet/> */}
       </Map>
     );

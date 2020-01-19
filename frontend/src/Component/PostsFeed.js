@@ -20,11 +20,11 @@ const styles = theme => ({
 class PostsFeed extends Component {
   constructor() {
     super()
-    console.log('Constructor');
+    // console.log('Constructor');
   }
   componentDidMount() {
-    console.log(this.props)
-    console.log('Mounting');
+    // console.log(this.props)
+    // console.log('Mounting');
   }
 
   render() {
