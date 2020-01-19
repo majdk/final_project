@@ -50,20 +50,20 @@ def register():
     if not data or not 'password' in data or not 'username' in data or not 'firstname' in data \
             or not 'lastname' in data or not 'email' in data or not 'bio' in data:
         abort(400)
-    # if 'file' not in request.files:
-    #     abort(400)
+    if 'file' not in request.files:
+        abort(400)
     check_user = User.query.filter_by(email=data['email']).first()
     if check_user:
         return make_response((jsonify({'error': 'email taken'})), 400)
     check_user = User.query.filter_by(username=data['username']).first()
     if check_user:
         return make_response((jsonify({'error': 'username taken'})), 400)
-    # file = request.files['file']
-    # picture_saved_name = save_picture(file)
+    file = request.files['file']
+    picture_saved_name = save_picture(file)
     hashed_password = bcrypt.generate_password_hash(data['password']).decode('utf-8')
     user = User(username=data['username'], first_name=data['firstname'], last_name=data['lastname'],
                 email=data['email'],
-                password=hashed_password, bio=data['bio'])
+                password=hashed_password, bio=data['bio'],image_file=picture_saved_name)
     db.session.add(user)
     db.session.commit()
     return make_response((jsonify({'ok': 'account created'})), 200)
@@ -110,17 +110,17 @@ def editprofile():
     user_data = request.get_json()
     if 'id' in user_data or 'username' in user_data or 'email' in user_data:
         abort(400)
-    # if 'file' not in request.files:
-    #     picture_path=user.image_file
-    # else:
-    #     file = request.files['file']
-    #     picture_path = save_picture(file)
+    if 'file' not in request.files:
+        picture_path=user.image_file
+    else:
+        file = request.files['file']
+        picture_path = save_picture(file)
     hashed_password = bcrypt.generate_password_hash(user_data['password']).decode('utf-8')
     user.first_name = user_data['firstname']
     user.last_name = user_data['lastname']
     user.password = hashed_password
     user.bio = user_data['bio']
-    # user.image_file=picture_path
+    user.image_file=picture_path
     db.session.commit()
     return make_response((jsonify({'ok': 'profile edited'})), 200)
 
