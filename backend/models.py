@@ -117,7 +117,10 @@ class Travel(db.Model):
         json_travel = {'city': self.city, 'country': self.country,
                        'content': self.content, 'title': self.title, 'userid': self.user_id, 'id': self.id
                        ,'start_date':self.start_date,
-                       'end_date':self.end_date,'date_posted':self.date_posted}
+                       'end_date':self.end_date,
+                       'date_posted':self.date_posted,
+                       'latitude': self.latitude,
+                       'longitude':self.longitude}
         return json_travel
 
     def to_json_with_sub_check(self,checkusersub):
@@ -128,7 +131,11 @@ class Travel(db.Model):
             isSub = True
         json_travel = {'city': self.city, 'country': self.country,
                        'content': self.content, 'title': self.title, 'userid': self.user_id, 'id': self.id,'isSub':isSub
-                       ,'start_date':self.start_date,'end_date':self.end_date,'date_posted':self.date_posted}
+                       ,'start_date':self.start_date,'end_date':self.end_date,
+                       'date_posted':self.date_posted,
+                       'latitude': self.latitude,
+                       'longitude': self.longitude
+                       }
         return json_travel
 
 # db.drop_all()
