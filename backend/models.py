@@ -13,6 +13,7 @@ class Subscribe(db.Model):
     subscriber_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'))
     notifications = db.relationship('Notification', backref='subscribe', cascade='all, delete-orphan',
                                     passive_deletes=True)
+    follow_id = db.Column(db.Integer, db.ForeignKey('follow.id', ondelete='CASCADE'), nullable=False)
 
     def to_json(self):
         json_sub = {'post_id': self.post_id, 'subscriber_id': self.subscriber_id
@@ -31,12 +32,16 @@ class Notification(db.Model):
 
 
 class Follow(db.Model):
-    follower_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), primary_key=True)
-    followed_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), primary_key=True)
+    id=db.Column(db.Integer, primary_key=True,unique=True)
+    follower_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
+    followed_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
+    subscribes = db.relationship('Subscribe', backref='follow', lazy='dynamic', cascade='all, delete-orphan',
+                              passive_deletes=True)
 
     def to_json(self):
         json_user = {'follower_id': self.follower_id, 'followed_id': self.followed_id,
-                     'follower_username':self.follower.username,'followed_username':self.followed.username}
+                     'follower_username':self.follower.username,'followed_username':self.followed.username
+                     ,'subscribed_travels':len(self.subscribes.all())}
         return json_user
 
 class User(db.Model, UserMixin):
@@ -67,7 +72,9 @@ class User(db.Model, UserMixin):
         return f"User('{self.username}', '{self.email}', '{self.image_file}')"
 
     def to_json(self):
-        json_user = {'id': self.id, 'username': self.username,'followers':len(self.followers.all()),'followed':len(self.followed.all())}
+        json_user = {'id': self.id, 'username': self.username,
+                     'followers':len(self.followers.all()),'followed':len(self.followed.all())
+                     ,'subscribed_travels':len(self.subscribed_travels.all())}
         return json_user
 
     def get_posts_as_list(self):
@@ -86,7 +93,7 @@ class User(db.Model, UserMixin):
 
 
 class Travel(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True,unique=True)
     title = db.Column(db.Text, nullable=False)
     date_posted = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False)

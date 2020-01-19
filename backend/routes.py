@@ -203,10 +203,25 @@ def subscribe(post_id):
         abort(404)
     user = User.query.filter_by(id=user_id).first()
     post= Travel.query.filter_by(id=post_id).first()
+    follow=Follow.query.filter_by(follower_id=user_id,followed_id=post.user_id).first()
+    if not user or not post or not follow:
+        abort(404)
+    subInstance=Subscribe(post_id=post_id,subscriber_id=user_id,follow_id=follow.id)
+    db.session.add(subInstance)
+    db.session.commit()
+    return 'done'
+
+@app.route("/user/unsubscribe/<int:post_id>", methods=['POST'])
+@login_required
+def unsubscribe(post_id):
+    user_id = current_user.get_id()
+    if not user_id:
+        abort(404)
+    user = User.query.filter_by(id=user_id).first()
+    post= Travel.query.filter_by(id=post_id).first()
     if not user or not post:
         abort(404)
-    subInstance=Subscribe(post_id=post_id,subscriber_id=user_id)
-    user.subscribed_travels.append(subInstance)
+    Subscribe.query.filter_by(post_id=post_id,subscriber_id=user_id).delete(synchronize_session=False)
     db.session.commit()
     return 'done'
 
@@ -298,9 +313,9 @@ def getpostfeed():
 def searchuser(user_tosearch):
     user=User.query.filter_by(username=user_tosearch).first()
     if not user:
-        user_id=''
-    else:
-        user_id=user.id
+        abort(404)
+
+    user_id=user.id
     return make_response(jsonify(user_id),200)
 
 @app.route("/user/followers", methods=['GET'])
