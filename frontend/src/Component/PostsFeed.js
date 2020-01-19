@@ -23,6 +23,7 @@ class PostsFeed extends Component {
     console.log('Constructor');
   }
   componentDidMount() {
+    console.log(this.props)
     console.log('Mounting');
   }
 
@@ -31,7 +32,7 @@ class PostsFeed extends Component {
     return (
       <div className={classes.root}>
       {this.props.posts.map((post) =>
-          <Post post={post} my_profile={this.props.my_profile} key={post.title} />
+          <Post post={post} key={post.id} />
       )}
         {/*<Post />*/}
         {/*<Post />*/}
