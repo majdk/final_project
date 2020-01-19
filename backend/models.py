@@ -34,6 +34,9 @@ class Follow(db.Model):
     follower_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), primary_key=True)
     followed_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), primary_key=True)
 
+    def to_json(self):
+        json_user = {'follower_id': self.follower_id, 'followed_id': self.followed_id}
+        return json_user
 
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, unique=True, primary_key=True)
@@ -63,7 +66,7 @@ class User(db.Model, UserMixin):
         return f"User('{self.username}', '{self.email}', '{self.image_file}')"
 
     def to_json(self):
-        json_user = {'id': self.id, 'username': self.username}
+        json_user = {'id': self.id, 'username': self.username,'followers':len(self.followers.all()),'followed':len(self.followed.all())}
         return json_user
 
     def get_posts_as_list(self):

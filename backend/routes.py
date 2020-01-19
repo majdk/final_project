@@ -189,14 +189,11 @@ def unfollow(followed_user_id):
     if not user or not followed_user:
         abort(404)
 
-    follow_instance=Follow(follower_id=user_id,followed_id=followed_user_id)
-    db.session.add(follow_instance)
-    db.session.commit()
-    user = User.query.filter_by(id=user_id).first()
-    followed_user = User.query.filter_by(id=followed_user_id).first()
-    return make_response(jsonify({'myuserfollowList':len(user.followed.all()),'theotheruserfollowersList:':len(followed_user.followers.all())
-                                  ,'myuserfollowersList':len(user.followers.all()),'theuseruserfollowList:':len(followed_user.followed.all())}), 200)
+    Follow.query.filter_by(followed_id=followed_user_id,follower_id=user_id).delete(synchronize_session=False)
 
+    db.session.commit()
+
+    return 'done'
 
 @app.route("/user/subscribe/<int:post_id>", methods=['POST'])
 @login_required
@@ -313,11 +310,14 @@ def getall():
     users=User.query.all()
     travels=Travel.query.all()
     subscribes=Subscribe.query.all()
+    follow=Follow.query.all()
     for i in users:
         print(i.to_json())
     for i in travels:
         print(i.to_json())
     for i in subscribes:
+        print(i.to_json())
+    for i in follow:
         print(i.to_json())
     return 'done '
 
