@@ -54,6 +54,7 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(60), nullable=False)
     image_file = db.Column(db.String(20))
+    bio = db.Column(db.String(240))
     travels = db.relationship('Travel', backref='traveler', lazy='dynamic', cascade='all, delete-orphan',
                               passive_deletes=True)
     followed = db.relationship('Follow', foreign_keys=[Follow.follower_id],
@@ -74,11 +75,12 @@ class User(db.Model, UserMixin):
     def to_json(self):
         json_user = {'id': self.id, 'username': self.username,
                      'followers':len(self.followers.all()),'followed':len(self.followed.all())
-                     ,'subscribed_travels':len(self.subscribed_travels.all())}
+                     ,'subscribed_travels':len(self.subscribed_travels.all()),
+                     'bio':self.bio,'first_name': self.first_name, 'last_name': self.last_name}
         return json_user
 
     def get_posts_as_list(self):
-        userPosts = [i.to_json() for i in self.followed]
+        userPosts = [i.to_json() for i in self.travels]
         return userPosts
 
     def getfollowers(self):
