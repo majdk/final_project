@@ -156,8 +156,7 @@ def addPost():
     user.travels.append(travel)
     db.session.commit()
     newTravel=Travel.query.filter_by(city=travel.city).first() # for testing purpose
-
-    return  make_response(jsonify({'userid':newTravel.user_id,'the_user:':user_id}), 200)
+    return make_response(jsonify({'userid':newTravel.user_id,'the_user:':user_id}), 200)
 
 @app.route("/user/follow/<int:followed_user_id>", methods=['POST'])
 @login_required
@@ -274,8 +273,18 @@ def getpostfeed():
     userPosts=user.get_posts_as_list()
     for i in user.followed.all():
         userPosts.append(i.followed.get_posts_as_list())
-    print(userPosts)
-    return 'done '
+
+    return make_response(jsonify(userPosts),200)
+
+@app.route("/user/searchuser/<string:user_tosearch>", methods=['GET'])
+@login_required
+def searchuser(user_tosearch):
+    user=User.query.filter_by(username=user_tosearch).first()
+    if not user:
+        user_id=''
+    else:
+        user_id=user.id
+    return make_response(jsonify(user_id),200)
 
 
 
