@@ -175,7 +175,7 @@ def getUserPosts(user_id):
     user = User.query.filter_by(id=user_id).first()
     if not user:
         abort(404)
-    userPosts = user.travels
+    userPosts = user.travels.order_by(Travel.date_posted)
     json_list = [i.to_json_with_sub_check(current_user_id) for i in userPosts]
     print(json_list)
     return make_response(jsonify(json_list), 200)
@@ -354,7 +354,7 @@ def getpostfeed():
     userPosts = user.get_posts_as_list()
     for i in user.followed.all():
         userPosts = userPosts + i.followed.get_posts_as_list()
-
+    userPosts.sort(key=lambda s: s['date_posted'])
     return make_response(jsonify(userPosts), 200)
 
 
