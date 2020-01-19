@@ -53,7 +53,7 @@ class User(db.Model, UserMixin):
     birth_date = db.Column(db.Date())
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(60), nullable=False)
-    image_file = db.Column(db.String(20))
+    image_file = db.Column(db.String(30))
     bio = db.Column(db.String(240))
     travels = db.relationship('Travel', backref='traveler', lazy='dynamic', cascade='all, delete-orphan',
                               passive_deletes=True)

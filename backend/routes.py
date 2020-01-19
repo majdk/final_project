@@ -12,12 +12,9 @@ from geopy import distance
 
 def save_picture(form_picture):
     random_hex = secrets.token_hex(8)
-    print("its me 15")
     _, f_ext = os.path.splitext(form_picture.filename)
     picture_fn = random_hex + f_ext
-    print("its me 18")
     picture_path = os.path.join(app.root_path, 'static/profile_pics', picture_fn)
-    print("its me 20")
     output_size = (125, 125)
     i = Image.open(form_picture)
     i.thumbnail(output_size)
@@ -57,29 +54,34 @@ def register():
             or not 'lastname' in data or not 'email' in data or not 'bio' in data:
         print("aborted after first check")
         abort(400)
+    if 'file' not in request.files:
+        abort(400)
+
     check_user = User.query.filter_by(email=data['email']).first()
     if check_user:
         return 'Email Taken'
     check_user = User.query.filter_by(username=data['username']).first()
     if check_user:
         return 'Username Taken'
+    file = request.files['file']
+    picture_saved_name = save_picture(file)
     hashed_password = bcrypt.generate_password_hash(data['password']).decode('utf-8')
     user = User(username=data['username'], first_name=data['firstname'], last_name=data['lastname'],
                 email=data['email'],
-                password=hashed_password, bio=data['bio'])
+                password=hashed_password, bio=data['bio'],image_file=picture_saved_name)
     print("oh we got here")
     db.session.add(user)
     db.session.commit()
     return 'Created'
 
-@app.route("/user/savepic", methods=['POST'])
-def savepic():
-    print("hello")
-    print(request.files)
-    file = request.files['file']
-    print("its me")
-    picture_saved_name=save_picture(file)
-    return picture_saved_name
+# @app.route("/user/savepic", methods=['POST'])
+# def savepic():
+#     print("hello")
+#     print(request.files)
+#     file = request.files['file']
+#     print("its me")
+#     picture_saved_name=save_picture(file)
+#     return picture_saved_name
 
 
 @app.route("/login", methods=['GET', 'POST'])
@@ -126,14 +128,17 @@ def editprofile():
     user_data = request.get_json()
     if 'id' in user_data or 'username' in user_data or 'email' in user_data:
         abort(404)
-    user = User(username=data['username'], first_name=data['firstname'], last_name=data['lastname'],
-                email=data['email'],
-                password=hashed_password)
+    if 'file' not in request.files:
+        picture_path=user.image_file
+    else:
+        file = request.files['file']
+        picture_path = save_picture(file)
     hashed_password = bcrypt.generate_password_hash(user_data['password']).decode('utf-8')
     user.first_name = user_data['firstname']
     user.last_name = user_data['lastname']
     user.password = hashed_password
     user.bio = user_data['bio']
+    user.image_file=picture_path
     db.session.commit()
     return 'done'
 
