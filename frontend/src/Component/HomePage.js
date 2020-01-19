@@ -132,8 +132,8 @@ class HomePage extends Component {
     // TODO: Check errors.
     getPostsFeed().then(res => {
       if (res !== 'error') {
-        // console.log('POSTS:')
-        // console.log(res);
+        console.log('POSTS:')
+        console.log(res);
         this.setState({
           posts_feed: res
         })

@@ -14,6 +14,9 @@ import NotificationsActiveIcon from '@material-ui/icons/NotificationsActive';
 import DeleteIcon from "@material-ui/icons/Delete";
 import dayjs from 'dayjs'
 import { UserContext } from "./UserContext"
+import PostDialog from "./PostDialog";
+import {addPost} from "./HomePage";
+import axios from "axios";
 
 const MyCardHeader = withStyles({
   avatar: {
@@ -66,9 +69,25 @@ const styles = theme => ({
 
 let notification_on = false;
 
+export const editPost = (id, newPost) => {
+  axios.defaults.withCredentials = true;
+  return axios
+      .post('http://127.0.0.1:5000/user/edit/' + id, newPost)
+      .then(response => {
+        return response.data
+      })
+      .catch(err => {
+        console.log(err)
+        return 'error'
+      })
+}
+
 class Post extends Component {
   constructor() {
     super()
+    this.state = {
+      edit_post_open: false,
+    }
     // console.log('Constructor');
   }
   componentDidMount() {
@@ -77,6 +96,37 @@ class Post extends Component {
   }
 
   static contextType = UserContext
+
+  handleClose = (submit, post) => {
+    // const post = {
+    //   title: this.state.post_title,
+    //   start_date: this.state.start_date,
+    //   end_date: this.state.end_date,
+    //   latitude: '38.8976989',
+    //   longitude: '-77.036553192281',
+    //   content: this.state.post_content,
+    // }
+    // console.log(post);
+    console.log(post)
+    if (submit) {
+    //   // TODO: check for errors.
+      editPost(this.props.post.id, post).then(res => {
+        console.log(post)
+        if (res !== 'error') {
+          // this.setState({
+          //   posts_feed: [...this.state.posts_feed, post]
+          // })
+        } else {
+
+        }
+      })
+    }
+    this.setState({ edit_post_open: false });
+  };
+
+  handleClickEdit = () => {
+    this.setState({ edit_post_open: true });
+  };
 
   render() {
     // const context = React.useContext(UserContext);
@@ -123,9 +173,15 @@ class Post extends Component {
             </CardContent>
             {my_post && (
                 <CardActions disableSpacing>
-                  <IconButton aria-label="edit post">
+                  <IconButton aria-label="edit post" onClick={this.handleClickEdit}>
                     <EditIcon />
                   </IconButton>
+                  <PostDialog
+                      edit={true}
+                      post={this.props.post}
+                      open={this.state.edit_post_open}
+                      handleClose={this.handleClose.bind(this)}
+                  />
                   <IconButton aria-label="delete post">
                     <DeleteIcon />
                   </IconButton>

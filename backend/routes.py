@@ -8,7 +8,7 @@ import datetime
 import os
 import secrets
 from geopy import distance
-
+import json
 
 def save_picture(form_picture):
     random_hex = secrets.token_hex(8)
@@ -46,7 +46,10 @@ def forbidden(error):
 def register():
     if current_user.is_authenticated:
         abort(403)
-    data = request.get_json()
+    data=request.form['user']
+    data=json.loads(data)
+    print(data)
+    print(request.files)
     if not data or not 'password' in data or not 'username' in data or not 'firstname' in data \
             or not 'lastname' in data or not 'email' in data or not 'bio' in data:
         abort(400)

@@ -30,17 +30,36 @@ const useStyles = theme => ({
     },
 });
 
-export const signup = user => {
+export const signup = (user, file) => {
     axios.defaults.withCredentials = true;
-    return axios
-        .post('http://127.0.0.1:5000/user', user)
-        .then(response => {
-            return response.data
+    const data = new FormData();
+    data.append('file', file);
+    data.append('user', JSON.stringify(user))
+    // data.append('filename', this.fileName.value);
+    return axios({
+        method: 'post',
+        url: 'http://127.0.0.1:5000/user',
+        data: data,
+        headers: {'Content-Type': 'multipart/form-data' }
+    })
+        .then(function (response) {
+            //handle success
+            console.log(response);
         })
-        .catch(err => {
-            console.log(err)
-            return 'error'
-        })
+        .catch(function (response) {
+            //handle error
+            console.log(response);
+        });
+    // axios.defaults.withCredentials = true;
+    // return axios
+    //     .post('http://127.0.0.1:5000/user', user)
+    //     .then(response => {
+    //         return response.data
+    //     })
+    //     .catch(err => {
+    //         console.log(err)
+    //         return 'error'
+    //     })
 }
 
 class SignUp extends Component {
@@ -53,6 +72,7 @@ class SignUp extends Component {
             bio: '',
             firstname: '',
             lastname: '',
+            imageURL: '',
             errors: {
                 email: '',
                 password: '',
@@ -67,7 +87,33 @@ class SignUp extends Component {
         // console.log('asdasdsa')
         this.onChange = this.onChange.bind(this)
         this.onSubmit = this.onSubmit.bind(this)
+        this.handleUploadImage = this.handleUploadImage.bind(this);
     }
+
+    handleUploadImage(ev) {
+        ev.preventDefault();
+
+        const data = new FormData();
+        data.append('file', this.uploadInput.files[0]);
+        // data.append('filename', this.fileName.value);
+
+
+        axios({
+            method: 'post',
+            url: 'myurl',
+            data: data,
+            headers: {'Content-Type': 'multipart/form-data' }
+        })
+            .then(function (response) {
+                //handle success
+                console.log(response);
+            })
+            .catch(function (response) {
+                //handle error
+                console.log(response);
+            });
+    }
+
     onChange(e) {
         this.setState({ [e.target.name]: e.target.value });
         e.preventDefault();
@@ -87,7 +133,7 @@ class SignUp extends Component {
             firstname: this.state.firstname,
             lastname: this.state.lastname,
         }
-        signup(user).then(res => {
+        signup(user, this.uploadInput.files[0]).then(res => {
             if (res !== 'error') {
                 this.props.history.push(`/login`)
             }
@@ -182,6 +228,17 @@ class SignUp extends Component {
                                     onChange={this.onChange}
                                 />
                             </Grid>
+                            <div>
+                                <input ref={(ref) => { this.uploadInput = ref; }} type="file" />
+                            </div>
+                            <img src={this.state.imageURL} alt="img" />
+                            {/*<div>*/}
+                            {/*    <input ref={(ref) => { this.fileName = ref; }} type="text" placeholder="Enter the desired name of file" />*/}
+                            {/*</div>*/}
+                            {/*<br />*/}
+                            {/*<div>*/}
+                            {/*    <button>Upload</button>*/}
+                            {/*</div>*/}
                         </Grid>
                         <Button
                             type="submit"

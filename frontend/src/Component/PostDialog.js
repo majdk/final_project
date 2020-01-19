@@ -15,8 +15,14 @@ import {
     KeyboardDatePicker,
 } from '@material-ui/pickers';
 import axios from "axios";
+import SimpleDialogDemo from "./Test";
 import jwt_decode from "jwt-decode";
-
+import ReactLeafletSearch from "react-leaflet-search";
+// import {
+//     SimpleButton,
+//     MapComponent,
+//     NominatimSearch
+// } from '@terrestris/react-geo';
 
 // const useStyles = theme => ({
 //     root: {
@@ -63,13 +69,31 @@ class PostDialog extends Component {
             end_date: new Date('2014-08-18T21:11:54'),
             post_title: '',
             post_content: '',
-        };
+            long: '',
+            lat: '',
+        }
+
         // console.log('asdasdsa')
         this.onChange = this.onChange.bind(this)
+        this.updateLocation = this.updateLocation.bind(this)
         // this.onSubmit = this.onSubmit.bind(this)
     }
 
     componentDidMount() {
+        console.log(this.props)
+        if (this.props.post) {
+            console.log('In post dialog')
+            console.log(this.props.post.longitude)
+            console.log(this.props.post.latitude)
+            this.setState( {
+                start_date: new Date(this.props.post.start_date),
+                end_date: new Date(this.props.post.end_date),
+                post_title: this.props.post.title,
+                post_content: this.props.post.content,
+                long: this.props.post.longitude,
+                lat: this.props.post.latitude,
+            })
+        }
     }
 
     createPost() {
@@ -77,8 +101,8 @@ class PostDialog extends Component {
           title: this.state.post_title,
           start_date: this.state.start_date,
           end_date: this.state.end_date,
-          latitude: '38.8976989',
-          longitude: '-77.036553192281',
+          latitude: this.state.lat,
+          longitude: this.state.long,
           content: this.state.post_content,
         }
         return post
@@ -98,13 +122,18 @@ class PostDialog extends Component {
         this.setState({ end_date: date });
         // setSelectedDateEnd(date);
     };
-
+    updateLocation(lat, long) {
+        this.setState({
+            lat: lat,
+            long: long,
+        })
+    };
     render() {
         // console.log('asdasdsa');
         const { classes } = this.props;
         return (
             <Dialog open={this.props.open} onClose={() => {this.props.handleClose(false)}} aria-labelledby="form-dialog-title">
-                <DialogTitle id="form-dialog-title">Add a Post</DialogTitle>
+                <DialogTitle id="form-dialog-title">{this.props.edit ? "Edit post" : "Add a Post"}</DialogTitle>
                 <DialogContent>
                     {/*<DialogContentText>*/}
                     {/*  To subscribe to this website, please enter your email address here. We will send updates*/}
@@ -119,6 +148,7 @@ class PostDialog extends Component {
                         name="post_title"
                         fullWidth
                         onChange={this.onChange}
+                        value={this.state.post_title}
                     />
                     <TextField
                         autoFocus
@@ -130,6 +160,7 @@ class PostDialog extends Component {
                         fullWidth
                         multiline
                         onChange={this.onChange}
+                        value={this.state.post_content}
                     />
                     <MuiPickersUtilsProvider utils={DateFnsUtils}>
                         <KeyboardDatePicker
@@ -144,6 +175,7 @@ class PostDialog extends Component {
                             KeyboardButtonProps={{
                                 'aria-label': 'change date',
                             }}
+                            // value={this.state.start_date}
                         />
                         <KeyboardDatePicker
                             disableToolbar
@@ -157,15 +189,17 @@ class PostDialog extends Component {
                             KeyboardButtonProps={{
                                 'aria-label': 'change date',
                             }}
+                            // value={this.state.end_date}
                         />
                     </MuiPickersUtilsProvider>
+                    <SimpleDialogDemo latlng={[this.state.lat, this.state.long]} updateLocation={this.updateLocation}/>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => this.props.handleClose(false)} color="primary">
                         Cancel
                     </Button>
                     <Button onClick={() => this.props.handleClose(true, this.createPost())} color="primary">
-                        ADD
+                        {this.props.edit ? "EDIT" : "ADD"}
                     </Button>
                 </DialogActions>
             </Dialog>
