@@ -35,7 +35,8 @@ class Follow(db.Model):
     followed_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), primary_key=True)
 
     def to_json(self):
-        json_user = {'follower_id': self.follower_id, 'followed_id': self.followed_id}
+        json_user = {'follower_id': self.follower_id, 'followed_id': self.followed_id,
+                     'follower_username':self.follower.username,'followed_username':self.followed.username}
         return json_user
 
 class User(db.Model, UserMixin):
@@ -70,8 +71,17 @@ class User(db.Model, UserMixin):
         return json_user
 
     def get_posts_as_list(self):
-        userPosts = [i.to_json() for i in self.travels]
+        userPosts = [i.to_json() for i in self.followed]
         return userPosts
+
+    def getfollowers(self):
+        userfollowers = [i.to_json() for i in self.followers]
+        return userfollowers
+
+    def getfollowings(self):
+        userfollowed = [i.to_json() for i in self.followed]
+        return userfollowed
+
 
 
 

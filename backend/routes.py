@@ -303,6 +303,29 @@ def searchuser(user_tosearch):
         user_id=user.id
     return make_response(jsonify(user_id),200)
 
+@app.route("/user/followers", methods=['GET'])
+@login_required
+def getfollowers():
+    user_id = current_user.get_id()
+    if not user_id:
+        abort(404)
+    user = User.query.filter_by(id=user_id).first()
+    if not user:
+        abort(404)
+
+    return make_response(jsonify(user.getfollowers()),200)
+
+@app.route("/user/following", methods=['GET'])
+@login_required
+def getfollowings():
+    user_id = current_user.get_id()
+    if not user_id:
+        abort(404)
+    user = User.query.filter_by(id=user_id).first()
+    if not user:
+        abort(404)
+    return make_response(jsonify(user.getfollowings()),200)
+
 
 
 @app.route("/getall", methods=['GET'])
