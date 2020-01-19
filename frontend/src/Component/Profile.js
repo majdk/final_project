@@ -109,7 +109,7 @@ const styles = theme => ({
 export const getPosts = user_id => {
   axios.defaults.withCredentials = true;
   return axios
-      .get('http://127.0.0.1:5000/users/posts/' + user_id)
+      .get('http://127.0.0.1:5000/user/posts/' + user_id)
       .then(response => {
         return response.data
       })
@@ -122,7 +122,7 @@ export const getPosts = user_id => {
 export const getUserInfo = user_id => {
   axios.defaults.withCredentials = true;
   return axios
-      .get('http://127.0.0.1:5000/users/' + user_id)
+      .get('http://127.0.0.1:5000/user/' + user_id)
       .then(response => {
         return response.data
       })
@@ -148,7 +148,7 @@ export const followUser = user_id => {
 export const unfollowUser = user_id => {
   axios.defaults.withCredentials = true;
   return axios
-      .post('http://127.0.0.1:5000/user/unfollow/' + user_id)
+      .delete('http://127.0.0.1:5000/user/follow/' + user_id)
       .then(response => {
         return response.data
       })
@@ -221,6 +221,7 @@ class Profile extends Component {
           user_info: res,
           is_followed: res.isfollowing,
         })
+        console.log("../../backend/static/profile_pics/" + this.state.user_info.image)
         // console.log(res);
       } else {
 
@@ -247,7 +248,7 @@ class Profile extends Component {
           <Grid item sm={2} xs={12} />
           <Grid item sm={8} xs={12}>
             <div className={classes.basicInfo}>
-              <Avatar className={classes.avatar} src="/static/images/zidane.jpg" />
+              <Avatar className={classes.avatar} src={"/static/images/" + this.state.user_info.image} />
               <div className={classes.info}>
                 <div className={classes.follow_line}>
                   <Typography variant="h4" className={classes.userName}>{this.state.user_info.username}</Typography>

@@ -1,4 +1,4 @@
-import React from "react";
+import React, {Fragment} from "react";
 import { fade } from "@material-ui/core/styles";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
@@ -22,6 +22,13 @@ import {addPost} from "./HomePage";
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
 import { makeStyles } from '@material-ui/core/styles';
+
+function isLoggedIn() {
+  if (localStorage.usertoken) {
+    return true
+  }
+  return false
+}
 
 const styles = theme => ({
   grow: {
@@ -161,7 +168,7 @@ class PrimarySearchAppBar extends React.Component {
   logOut(e) {
     e.preventDefault()
     axios.defaults.withCredentials = true;
-    axios.get('http://127.0.0.1:5000/logout').then(response => {
+    axios.post('http://127.0.0.1:5000/logout').then(response => {
       localStorage.removeItem('usertoken')
       this.props.history.push(`/`)
     })
@@ -225,9 +232,11 @@ class PrimarySearchAppBar extends React.Component {
               component={Link}
               to="/"
             >
-              Material-UI
+              Trivago
             </Typography>
-            <div className={classes.search}>
+            {isLoggedIn() &&
+            ( <Fragment>
+              <div className={classes.search}>
               {/*<div className={classes.searchIcon}>*/}
               {/*  <SearchIcon />*/}
               {/*</div>*/}
@@ -303,6 +312,7 @@ class PrimarySearchAppBar extends React.Component {
                 Logout
               </Button>
             </div>
+            </Fragment>)}
           </Toolbar>
         </AppBar>
         <Snackbar open={this.state.user_not_found} autoHideDuration={3000} onClose={this.onCloseUserNotFound}>

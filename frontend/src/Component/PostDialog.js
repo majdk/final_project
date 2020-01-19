@@ -46,18 +46,18 @@ import ReactLeafletSearch from "react-leaflet-search";
 //     }
 // });
 
-export const addPost = post => {
-    axios.defaults.withCredentials = true;
-    return axios
-        .post('http://127.0.0.1:5000/user/addpost', post)
-        .then(response => {
-            return response.data
-        })
-        .catch(err => {
-            console.log(err)
-            return 'error'
-        })
-}
+// export const addPost = post => {
+//     axios.defaults.withCredentials = true;
+//     return axios
+//         .post('http://127.0.0.1:5000/user/addpost', post)
+//         .then(response => {
+//             return response.data
+//         })
+//         .catch(err => {
+//             console.log(err)
+//             return 'error'
+//         })
+// }
 
 
 

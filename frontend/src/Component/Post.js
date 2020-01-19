@@ -72,7 +72,7 @@ let notification_on = false;
 export const editPost = (id, newPost) => {
   axios.defaults.withCredentials = true;
   return axios
-      .post('http://127.0.0.1:5000/user/edit/' + id, newPost)
+      .put('http://127.0.0.1:5000/user/post/' + id, newPost)
       .then(response => {
         return response.data
       })

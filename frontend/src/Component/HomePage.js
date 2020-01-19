@@ -44,7 +44,7 @@ const useStyles = theme => ({
 export const addPost = post => {
   axios.defaults.withCredentials = true;
   return axios
-      .post('http://127.0.0.1:5000/user/addpost', post)
+      .post('http://127.0.0.1:5000/user/post', post)
       .then(response => {
         return response.data
       })
