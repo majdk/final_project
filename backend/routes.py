@@ -51,16 +51,17 @@ def register():
     if not data or not 'password' in data or not 'username' in data or not 'firstname' in data \
             or not 'lastname' in data or not 'email' in data or not 'bio' in data:
         abort(400)
-    if 'file' not in request.files:
-        abort(400)
     check_user = User.query.filter_by(email=data['email']).first()
     if check_user:
         return make_response((jsonify({'error': 'email taken'})), 400)
     check_user = User.query.filter_by(username=data['username']).first()
     if check_user:
         return make_response((jsonify({'error': 'username taken'})), 400)
-    file = request.files['file']
-    picture_saved_name = save_picture(file)
+    if 'file' in request.files:
+        file = request.files['file']
+        picture_saved_name = save_picture(file)
+    else:
+        picture_saved_name=""
     hashed_password = bcrypt.generate_password_hash(data['password']).decode('utf-8')
     user = User(username=data['username'], first_name=data['firstname'], last_name=data['lastname'],
                 email=data['email'],
@@ -348,12 +349,9 @@ def searchuser(user_tosearch):
     return make_response(jsonify(user_id), 200)
 
 
-@app.route("/user/followers", methods=['GET'])
+@app.route("/user/followers/<int:user_id>", methods=['GET'])
 @login_required
-def getfollowers():
-    user_id = current_user.get_id()
-    if not user_id:
-        abort(403)
+def getfollowers(user_id):
     user = User.query.filter_by(id=user_id).first()
     if not user:
         abort(404)
@@ -361,12 +359,9 @@ def getfollowers():
     return make_response(jsonify(user.getfollowers()), 200)
 
 
-@app.route("/user/following", methods=['GET'])
+@app.route("/user/following/<int:user_id>", methods=['GET'])
 @login_required
-def getfollowings():
-    user_id = current_user.get_id()
-    if not user_id:
-        abort(403)
+def getfollowings(user_id):
     user = User.query.filter_by(id=user_id).first()
     if not user:
         abort(404)
