@@ -68,10 +68,11 @@ const styles = theme => ({
     justifyContent: "center"
   },
   inputRoot: {
-    color: "inherit"
+    color: "inherit",
+    width: "100%"
   },
   inputInput: {
-    padding: theme.spacing(1, 1, 1, 7),
+    padding: theme.spacing(1, 1, 1, 3),
     transition: theme.transitions.create("width"),
     width: "100%",
     [theme.breakpoints.up("md")]: {
@@ -250,7 +251,7 @@ class PrimarySearchAppBar extends React.Component {
                 // inputProps={{ "aria-label": "search" }}
                 endAdornment={
                   (
-                    <InputAdornment position="start">
+                    <InputAdornment position="end">
                       <IconButton
                           color="inherit"
                           style={{ backgroundColor: 'transparent' }}

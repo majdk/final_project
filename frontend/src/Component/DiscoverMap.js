@@ -93,6 +93,11 @@ class SimpleExample extends React.Component {
           choseLocation: false,
           posts_in_radius: res
         })
+        const leafletMap = this.leafletMap.leafletElement;
+        leafletMap.fitBounds(res.map(function (post) { return [post.latitude, post.longitude]}));
+        // leafletMap.zoomOut(0.5)
+        // leafletMap.zoomSnap()
+        // this.leafletMap.fitBounds()
       } else {
 
       }

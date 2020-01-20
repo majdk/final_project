@@ -166,7 +166,7 @@ export const unfollowUser = user_id => {
 export const getFollowers = user_id => {
   axios.defaults.withCredentials = true;
   return axios
-      .get('http://127.0.0.1:5000/user/followers')
+      .get('http://127.0.0.1:5000/user/followers/' + user_id)
       .then(response => {
         return response.data
       })
@@ -179,7 +179,7 @@ export const getFollowers = user_id => {
 export const getFollowing = user_id => {
   axios.defaults.withCredentials = true;
   return axios
-      .get('http://127.0.0.1:5000/user/following')
+      .get('http://127.0.0.1:5000/user/following/' + user_id)
       .then(response => {
         return response.data
       })

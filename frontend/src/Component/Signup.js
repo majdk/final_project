@@ -8,6 +8,7 @@ import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import axios from "axios";
+import SnackbarContent from "@material-ui/core/SnackbarContent";
 
 
 const useStyles = theme => ({
@@ -27,6 +28,10 @@ const useStyles = theme => ({
     },
     submit: {
         margin: theme.spacing(3, 0, 2),
+    },
+    snackbar: {
+        margin: theme.spacing(1),
+        backgroundColor: theme.palette.error.dark,
     },
 });
 
@@ -49,6 +54,7 @@ export const signup = (user, file) => {
         .catch(function (response) {
             //handle error
             console.log(response);
+            return 'error'
         });
     // axios.defaults.withCredentials = true;
     // return axios
@@ -84,42 +90,38 @@ class SignUp extends Component {
             invalid: 0
 
         };
-        // console.log('asdasdsa')
         this.onChange = this.onChange.bind(this)
         this.onSubmit = this.onSubmit.bind(this)
-        this.handleUploadImage = this.handleUploadImage.bind(this);
-    }
-
-    handleUploadImage(ev) {
-        ev.preventDefault();
-
-        const data = new FormData();
-        data.append('file', this.uploadInput.files[0]);
-        // data.append('filename', this.fileName.value);
-
-
-        axios({
-            method: 'post',
-            url: 'myurl',
-            data: data,
-            headers: {'Content-Type': 'multipart/form-data' }
-        })
-            .then(function (response) {
-                //handle success
-                console.log(response);
-            })
-            .catch(function (response) {
-                //handle error
-                console.log(response);
-            });
     }
 
     onChange(e) {
         this.setState({ [e.target.name]: e.target.value });
+        this.setState({
+            errors: {
+                ...this.state.errors, [e.target.name]: false
+            }
+        })
         e.preventDefault();
         // console.log('asdasdsa');
     }
 
+    validateInput() {
+        let not_valid = (this.state.username.length === 0 ||
+                    this.state.firstname.length === 0 ||
+                    this.state.lastname.length === 0  ||
+                    this.state.email.length === 0     ||
+                    this.state.password.length === 0    )
+        this.setState({
+           errors: {
+               username: (this.state.username.length === 0),
+               firstname: (this.state.firstname.length === 0),
+               lastname: (this.state.lastname.length === 0),
+               email: (this.state.email.length === 0),
+               password: (this.state.password.length === 0),
+           }
+       })
+        return !not_valid
+    }
 
     onSubmit(e) {
         e.preventDefault();
@@ -133,14 +135,15 @@ class SignUp extends Component {
             firstname: this.state.firstname,
             lastname: this.state.lastname,
         }
-        signup(user, this.uploadInput.files[0]).then(res => {
-            if (res !== 'error') {
-                this.props.history.push(`/login`)
-            }
-            else {
-                this.setState({invalid: 1});
-            }
-        })
+        if (this.validateInput()) {
+            signup(user, this.uploadInput.files[0]).then(res => {
+                if (res !== 'error') {
+                    this.props.history.push(`/login`)
+                } else {
+                    this.setState({invalid: 1});
+                }
+            })
+        }
     }
 // export default function SignIn() {
     render() {
@@ -151,10 +154,16 @@ class SignUp extends Component {
                 <CssBaseline />
                 <div className={classes.paper}>
                     <Typography component="h1" variant="h4">
-                        Sign up
+                        Sign Up
                     </Typography>
                     <form className={classes.form} noValidate>
                         <Grid container spacing={2}>
+                            <Grid item xs={12}>
+                                {this.state.invalid >0 &&
+                                <SnackbarContent
+                                    className={classes.snackbar}
+                                    message={'Used username or email'}/> }
+                            </Grid>
                             <Grid item xs={12}>
                                 <TextField
                                     variant="outlined"
@@ -165,6 +174,9 @@ class SignUp extends Component {
                                     name="username"
                                     autoComplete="user_name"
                                     onChange={this.onChange}
+                                    autoFocus
+                                    error={this.state.errors.username}
+                                    size={"small"}
                                 />
                             </Grid>
                             <Grid item xs={12} sm={6}>
@@ -176,8 +188,9 @@ class SignUp extends Component {
                                     fullWidth
                                     id="firstName"
                                     label="First Name"
-                                    autoFocus
                                     onChange={this.onChange}
+                                    error={this.state.errors.firstname}
+                                    size={"small"}
                                 />
                             </Grid>
                             <Grid item xs={12} sm={6}>
@@ -190,6 +203,8 @@ class SignUp extends Component {
                                     name="lastname"
                                     autoComplete="lname"
                                     onChange={this.onChange}
+                                    error={this.state.errors.lastname}
+                                    size={"small"}
                                 />
                             </Grid>
                             <Grid item xs={12}>
@@ -202,6 +217,8 @@ class SignUp extends Component {
                                     name="email"
                                     autoComplete="email"
                                     onChange={this.onChange}
+                                    error={this.state.errors.email}
+                                    size={"small"}
                                 />
                             </Grid>
                             <Grid item xs={12}>
@@ -215,6 +232,8 @@ class SignUp extends Component {
                                     id="password"
                                     autoComplete="current-password"
                                     onChange={this.onChange}
+                                    error={this.state.errors.password}
+                                    size={"small"}
                                 />
                             </Grid>
                             <Grid item xs={12}>
@@ -226,6 +245,11 @@ class SignUp extends Component {
                                     name="bio"
                                     variant="outlined"
                                     onChange={this.onChange}
+                                    size="small"
+                                    multiline
+                                    rowsMax="3"
+                                    rows="3"
+                                    inputProps={{ maxLength: 150 }}
                                 />
                             </Grid>
                             <div>
