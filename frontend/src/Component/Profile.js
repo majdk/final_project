@@ -266,7 +266,7 @@ class Profile extends Component {
         console.log(res)
         // console.log(res);
       } else {
-
+        this.props.history.push('/err')
       }
     })
     getPosts(user_id).then(res => {

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { BrowserRouter as Router, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
 
 import PrimarySearchAppBar from './NavBar'
 import SignIn from './Login'
@@ -13,6 +13,7 @@ import { Redirect } from "react-router-dom";
 import { withStyles } from "@material-ui/core/styles";
 import jwt_decode from "jwt-decode";
 import { UserContext } from "./UserContext"
+import ErrorPage from "./ErrorPage"
 
 const styles = theme => ({
   root: {
@@ -94,6 +95,7 @@ class App extends Component {
         >
           <Router>
               <PrimarySearchAppBar />
+            <Switch>
               <Route exact path="/" render={(props) => (
                     !isLoggedIn() ? (
                         <Redirect to="/login"/>) : (<HomePage {...props} />)
@@ -118,6 +120,8 @@ class App extends Component {
                     !isLoggedIn() ? (
                         <Redirect to="/login"/>) : (<Profile key={props.match.params.id} {...props} />)
                 )}/>
+              <Route component={ErrorPage} />
+            </Switch>
           </Router>
         </UserContext.Provider>
       </div>
