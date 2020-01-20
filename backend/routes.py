@@ -376,22 +376,30 @@ def getfollowings():
 @app.route("/user/search_on_map", methods=['GET'])
 @login_required
 def search_on_map():
-    data = request.get_json()
+    # data = request.get_json()
+    # print(request.params)
     user_id = current_user.get_id()
     if not user_id:
         abort(403)
-    if not data or not 'longitude' in data or not 'latitude' in data or not 'km' in data:
-        abort(404)
-    long = data['longitude']
-    lat = data['latitude']
-    km = data['km']
+    # print('got her')
+    # if not data or not 'longitude' in data or not 'latitude' in data or not 'km' in data:
+    #     abort(404)
+    # print('got her')
+    # long = data['longitude']
+    # lat = data['latitude']
+    # km = data['km']
+    long = request.args.get('longitude')
+    lat = request.args.get('latitude')
+    km = request.args.get('km')
     lat_long_tuple = (lat, long)
-
+    print(lat_long_tuple)
     all_travels = Travel.query.all()
 
     travels_within_radius = []
     for i in all_travels:
         distance_from_center = distance.distance(lat_long_tuple, (i.latitude, i.longitude))
+        print((i.latitude, i.longitude))
+        print(distance_from_center)
         if distance_from_center <= float(km):
             travels_within_radius.append(i.to_json())
     print(travels_within_radius)

@@ -40,7 +40,8 @@ class Follow(db.Model):
 
     def to_json(self):
         json_user = {'follower_id': self.follower_id, 'followed_id': self.followed_id,
-                     'follower_username':self.follower.username,'followed_username':self.followed.username
+                     'follower_username':self.follower.username,'followed_username':self.followed.username,
+                    'follower_image':self.follower.image_file,'followed_image':self.followed.image_file
                      ,'subscribed_travels':len(self.subscribes.all())}
         return json_user
 

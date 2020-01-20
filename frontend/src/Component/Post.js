@@ -67,7 +67,7 @@ const styles = theme => ({
 });
 
 
-let notification_on = false;
+let notification_on = true;
 
 export const editPost = (id, newPost) => {
   axios.defaults.withCredentials = true;

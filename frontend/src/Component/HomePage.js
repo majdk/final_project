@@ -72,45 +72,7 @@ export const getPostsFeed = post => {
         return 'error'
       })
 }
-// export default function HomePage() {
-//   const classes = useStyles();
-//   const [open, setOpen] = React.useState(false);
-//
-//   const handleClickOpen = () => {
-//     setOpen(true);
-//   };
-//
-//   const handleClose = (submit) => {
-//     // const post = {
-//     //   email: this.state.email,
-//     //   password: this.state.password,
-//     //   username: this.state.username,
-//     //   bio: this.state.bio,
-//     //   firstname: this.state.firstname,
-//     //   lastname: this.state.lastname,
-//     // }
-//     // if (submit) {
-//     //   // TODO: check for errors.
-//     //   signup(post).then(res => {
-//     //     if (res != 'error') {
-//     //
-//     //     }
-//     //   })
-//     // }
-//     setOpen(false);
-//     console.log(submit);
-//   };
-//   const [selectedDateStart, setSelectedDateStart] = React.useState(new Date('2014-08-18T21:11:54'));
-//   const [selectedDateEnd, setSelectedDateEnd] = React.useState(new Date('2014-08-18T21:11:54'));
-//
-//   const handleDateChangeStart = date => {
-//     setSelectedDateStart(date);
-//   };
-//   const handleDateChangeEnd = date => {
-//     setSelectedDateEnd(date);
-//   };
-//
-// }
+
 
 class HomePage extends Component {
   constructor() {

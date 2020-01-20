@@ -35,26 +35,27 @@ export default function FollowList(props) {
 
         setChecked(newChecked);
     };
-
+    // const empty_list = (props.list.length > 0);
     return (
+        props.following &&
         <Paper className={classes.root}>
-            <List dense >
-                {props.list.map(value => {
-                    const labelId = `checkbox-list-secondary-label-${value}`;
-                    return (
-
-                        <ListItem key={value} button>
-                            {/*<ListItemAvatar>*/}
-                            {/*    <Avatar*/}
-                            {/*        alt={`Avatar n°${value + 1}`}*/}
-                            {/*        src={`/static/images/avatar/${value + 1}.jpg`}*/}
-                            {/*    />*/}
-                            {/*</ListItemAvatar>*/}
-                            <ListItemText id={labelId} primary={value.followed_username} />
-                        </ListItem>
-                    );
-                })}
-            </List>
-        </Paper>
+        <List dense>
+            {props.list.map(value => {
+                const labelId = `checkbox-list-secondary-label-${value}`;
+                return (
+                    <ListItem key={value} button>
+                        <ListItemAvatar>
+                            <Avatar
+                                alt={`Avatar n°${value + 1}`}
+                                src={"/static/images/" + (props.following ? value.followed_image : value.following_image)}
+                            />
+                        </ListItemAvatar>
+                        <ListItemText id={labelId}
+                                      primary={props.following ? value.followed_username : value.following.username}/>
+                    </ListItem>
+                );
+            })}
+        </List>
+    </Paper>
     );
 }

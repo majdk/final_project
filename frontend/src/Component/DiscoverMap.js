@@ -9,6 +9,10 @@ import InputAdornment from "@material-ui/core/InputAdornment";
 import FormHelperText from "@material-ui/core/FormHelperText";
 import FormControl from "@material-ui/core/FormControl";
 import { withStyles } from "@material-ui/core/styles";
+import jwt_decode from "jwt-decode";
+import axios from "axios";
+import {getPostsFeed} from "./HomePage";
+import Post from "./Post";
 
 const styles = theme => ({
   root: {
@@ -24,6 +28,20 @@ const styles = theme => ({
   }
 });
 
+export const searchMap = params => {
+  axios.defaults.withCredentials = true;
+  console.log(params)
+  return axios
+      .get('http://127.0.0.1:5000/user/search_on_map', { params: params})
+      .then(response => {
+        return response.data
+      })
+      .catch(err => {
+        console.log(err)
+        return 'error'
+      })
+}
+
 class SimpleExample extends React.Component {
   constructor() {
     super();
@@ -36,8 +54,16 @@ class SimpleExample extends React.Component {
       ],
       lat: 51.505,
       lng: -0.09,
-      zoom: 13
+      zoom: 13,
+      currentPos: [51.505, -0.09],
+      radius: 0,
+      posts_in_radius: [],
+      choseLocation: false,
     };
+
+    this.searchTravels = this.searchTravels.bind(this);
+    this.handleClick = this.handleClick.bind(this);
+    this.onRadiusChange = this.onRadiusChange.bind(this);
   }
 
   componentDidMount() {
@@ -45,12 +71,42 @@ class SimpleExample extends React.Component {
     leafletMap.fitBounds(this.state.places);
   }
 
+  searchTravels() {
+    searchMap({
+      km: this.state.radius,
+      longitude: this.state.currentPos.lng,
+      latitude: this.state.currentPos.lat,
+    }).then(res => {
+      if (res !== 'error') {
+        console.log(res)
+        this.setState({
+          posts_in_radius: res
+        })
+      } else {
+
+      }
+    })
+  }
+
+  handleClick(e){
+    this.setState({
+      currentPos: e.latlng,
+      choseLocation: true,
+    });
+    // console.log(this.props)
+    // this.props.updateLocation(e.latlng.lat, e.latlng.lng);
+  }
+
+  onRadiusChange(e) {
+    this.setState({radius: e.target.value})
+  }
   render() {
     console.log('Rendering map...')
     const { classes } = this.props;
     const position = [this.state.lat, this.state.lng];
     return (
       <Map
+        onClick={this.handleClick}
         center={position}
         zoom={this.state.zoom}
         ref={m => {
@@ -65,13 +121,22 @@ class SimpleExample extends React.Component {
         {/*{this.state.places.map(place => (*/}
         {/*  <Marker position={place} />*/}
         {/*))}*/}
-        <Marker position={position}>
+        {this.state.posts_in_radius.map((post) =>
+            <Marker position={[post.latitude, post.longitude]} key={post.id}>
+            <Popup>
+              {post.username}
+            </Popup>
+          </Marker>
+        )}
+        {this.state.choseLocation &&
+        <Marker position={this.state.currentPos} >
           <Popup>
-            A pretty CSS3 popup. <br /> Easily customizable.
+            A pretty CSS3 popup. <br/> Easily customizable.
           </Popup>
         </Marker>
+        }
         <Control position="bottomleft">
-          <Button variant="contained" color="primary">
+          <Button variant="contained" color="primary" onClick={this.searchTravels} disabled={!this.state.choseLocation}>
             Search
           </Button>
         </Control>
@@ -89,6 +154,7 @@ class SimpleExample extends React.Component {
                 "aria-label": "weight"
               }}
               labelWidth={0}
+              onChange={this.onRadiusChange}
             />
             <FormHelperText id="outlined-weight-helper-text">
               Radius

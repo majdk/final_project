@@ -343,16 +343,16 @@ class Profile extends Component {
                 <Tab label="Posts" {...a11yProps(0)} />
                 <Tab label="Followers" {...a11yProps(1)} />
                 <Tab label="Following" {...a11yProps(2)} />
-                <Tab label="Info" {...a11yProps(3)} />
+                {/*<Tab label="Info" {...a11yProps(3)} />*/}
               </Tabs>
               <TabPanel value={this.state.tab_index} index={0}>
                 <PostsFeed posts={this.state.posts}/>
               </TabPanel>
               <TabPanel value={this.state.tab_index} index={1}>
-               <FollowList list={this.state.followers} />
+               <FollowList list={this.state.followers} following={false} />
               </TabPanel>
               <TabPanel value={this.state.tab_index} index={2}>
-                <FollowList list={this.state.following} />
+                <FollowList list={this.state.following} following={true}/>
               </TabPanel>
             </AppBar>)
             }
