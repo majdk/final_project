@@ -73,7 +73,7 @@ const styles = theme => ({
 });
 
 
-let notification_on = true;
+// let notification_on = true;
 
 export const editPost = (id, newPost) => {
   axios.defaults.withCredentials = true;
@@ -101,6 +101,32 @@ export const deletePost = (id) => {
       })
 }
 
+export const subPost = (id) => {
+  axios.defaults.withCredentials = true;
+  return axios
+      .post('http://127.0.0.1:5000/user/subscribe/' + id)
+      .then(response => {
+        return response.data
+      })
+      .catch(err => {
+        console.log(err)
+        return 'error'
+      })
+}
+
+export const unsubPost = (id) => {
+  axios.defaults.withCredentials = true;
+  return axios
+      .delete('http://127.0.0.1:5000/user/subscribe/' + id)
+      .then(response => {
+        return response.data
+      })
+      .catch(err => {
+        console.log(err)
+        return 'error'
+      })
+}
+
 class Post extends Component {
   constructor() {
     super()
@@ -111,11 +137,13 @@ class Post extends Component {
         start_date: new Date(),
         end_date: new Date(),
         content: '',
+        isSub: false,
       },
       delete_post_open: false,
     }
     this.handleClickDelete = this.handleClickDelete.bind(this);
     this.handleCloseDeletePost = this.handleCloseDeletePost.bind(this);
+    this.handleSub = this.handleSub.bind(this);
 
     // console.log('Constructor');
   }
@@ -130,11 +158,11 @@ class Post extends Component {
   static contextType = UserContext
 
   handleClose = (submit, post) => {
-    console.log(post)
+    // console.log(post)
     if (submit) {
     //   // TODO: check for errors.
       editPost(this.props.post.id, post).then(res => {
-        console.log(post)
+        // console.log(post)
         if (res !== 'error') {
           this.setState({
             post: post,
@@ -152,11 +180,31 @@ class Post extends Component {
   };
 
   handleClickDelete = () => {
-    console.log('Deleting '+ this.props.post.id)
+    // console.log('Deleting '+ this.props.post.id)
     this.setState({
       delete_post_open: true,
     })
     // this.props.deleteFunc(this.props.post.id)
+  }
+
+  handleSub = () => {
+    if (this.state.post.isSub) {
+      unsubPost(this.props.post.id).then(res => {
+        if (res !== 'error') {
+          this.setState({
+            post: {...this.state.post, isSub: !this.state.post.isSub}
+          })
+        }
+      })
+    } else {
+      subPost(this.props.post.id).then(res => {
+        if (res !== 'error') {
+          this.setState({
+            post: {...this.state.post, isSub: !this.state.post.isSub}
+          })
+        }
+      })
+    }
   }
 
   handleCloseDeletePost = (confirm) => {
@@ -202,8 +250,8 @@ class Post extends Component {
                 action={
                   <div>
                     {!my_post && (
-                        <IconButton size="small" aria-label="settings">
-                          {notification_on ? (
+                        <IconButton size="small" aria-label="settings" onClick={this.handleSub}>
+                          {!this.state.post.isSub ? (
                               <NotificationsActiveIcon />
                           ) : (
                               <NotificationsOffIcon />

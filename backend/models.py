@@ -84,6 +84,10 @@ class User(db.Model, UserMixin):
         userPosts = [i.to_json() for i in self.travels]
         return userPosts
 
+    def get_posts_as_list_with_sub(self, other_user):
+        userPosts = [i.to_json_with_sub_check(other_user) for i in self.travels]
+        return userPosts
+
     def getfollowers(self):
         userfollowers = [i.to_json() for i in self.followers]
         return userfollowers

@@ -332,9 +332,9 @@ def getpostfeed():
     if not user_id:
         abort(403)
     user = User.query.filter_by(id=user_id).first()
-    userPosts = user.get_posts_as_list()
+    userPosts = user.get_posts_as_list_with_sub(user_id)
     for i in user.followed.all():
-        userPosts = userPosts + i.followed.get_posts_as_list()
+        userPosts = userPosts + i.followed.get_posts_as_list_with_sub(user_id)
     userPosts.sort(key=lambda s: s['date_posted'])
     return make_response(jsonify(userPosts), 200)
 

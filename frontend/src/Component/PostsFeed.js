@@ -41,8 +41,8 @@ class PostsFeed extends Component {
         posts: this.props.posts,
       })
     }
-    console.log('PROPS:')
-    console.log(this.props)
+    // console.log('PROPS:')
+    // console.log(this.props)
     // console.log('Mounting');
   }
 
@@ -54,6 +54,7 @@ class PostsFeed extends Component {
 
   render() {
     const { classes } = this.props;
+    console.log(this.state.posts)
     return (
       <div className={classes.root}>
       {this.state.posts.slice(0).reverse().map((post) =>
