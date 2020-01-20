@@ -17,6 +17,12 @@ import { UserContext } from "./UserContext"
 import PostDialog from "./PostDialog";
 import {addPost} from "./HomePage";
 import axios from "axios";
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import Button from '@material-ui/core/Button';
 
 const MyCardHeader = withStyles({
   avatar: {
@@ -82,6 +88,19 @@ export const editPost = (id, newPost) => {
       })
 }
 
+export const deletePost = (id) => {
+  axios.defaults.withCredentials = true;
+  return axios
+      .delete('http://127.0.0.1:5000/user/post/' + id)
+      .then(response => {
+        return response.data
+      })
+      .catch(err => {
+        console.log(err)
+        return 'error'
+      })
+}
+
 class Post extends Component {
   constructor() {
     super()
@@ -92,8 +111,12 @@ class Post extends Component {
         start_date: new Date(),
         end_date: new Date(),
         content: '',
-      }
+      },
+      delete_post_open: false,
     }
+    this.handleClickDelete = this.handleClickDelete.bind(this);
+    this.handleCloseDeletePost = this.handleCloseDeletePost.bind(this);
+
     // console.log('Constructor');
   }
   componentDidMount() {
@@ -107,15 +130,6 @@ class Post extends Component {
   static contextType = UserContext
 
   handleClose = (submit, post) => {
-    // const post = {
-    //   title: this.state.post_title,
-    //   start_date: this.state.start_date,
-    //   end_date: this.state.end_date,
-    //   latitude: '38.8976989',
-    //   longitude: '-77.036553192281',
-    //   content: this.state.post_content,
-    // }
-    // console.log(post);
     console.log(post)
     if (submit) {
     //   // TODO: check for errors.
@@ -125,9 +139,6 @@ class Post extends Component {
           this.setState({
             post: post,
           })
-          // this.setState({
-          //   posts_feed: [...this.state.posts_feed, post]
-          // })
         } else {
 
         }
@@ -139,6 +150,31 @@ class Post extends Component {
   handleClickEdit = () => {
     this.setState({ edit_post_open: true });
   };
+
+  handleClickDelete = () => {
+    console.log('Deleting '+ this.props.post.id)
+    this.setState({
+      delete_post_open: true,
+    })
+    // this.props.deleteFunc(this.props.post.id)
+  }
+
+  handleCloseDeletePost = (confirm) => {
+    if (confirm) {
+      deletePost(this.props.post.id).then(res => {
+        // console.log(post)
+        if (res !== 'error') {
+          this.props.deleteFunc(this.props.post.id)
+        } else {
+
+        }
+      })
+      //
+    }
+    this.setState({
+      delete_post_open: false,
+    })
+  }
 
   render() {
     // const context = React.useContext(UserContext);
@@ -195,11 +231,27 @@ class Post extends Component {
                       open={this.state.edit_post_open}
                       handleClose={this.handleClose.bind(this)}
                   />
-                  <IconButton aria-label="delete post">
+                  <IconButton aria-label="delete post" onClick={this.handleClickDelete}>
                     <DeleteIcon />
                   </IconButton>
                 </CardActions>
             )}
+            <Dialog
+                open={this.state.delete_post_open}
+                onClose={() => this.handleCloseDeletePost(false)}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+              <DialogTitle id="alert-dialog-title">{"Are you sure you want to delete the post?"}</DialogTitle>
+              <DialogActions>
+                <Button onClick={() => this.handleCloseDeletePost(false)} color="primary">
+                  No
+                </Button>
+                <Button onClick={() => this.handleCloseDeletePost(true)} color="primary" autoFocus>
+                  Yes
+                </Button>
+              </DialogActions>
+            </Dialog>
           </Card>
         </div>
     )

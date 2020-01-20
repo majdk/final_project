@@ -20,19 +20,44 @@ const styles = theme => ({
 class PostsFeed extends Component {
   constructor() {
     super()
+    this.state = {
+      posts: [],
+    }
+    this.deleteFunc = this.deleteFunc.bind(this);
     // console.log('Constructor');
   }
   componentDidMount() {
-    console.log(this.props.posts)
+    this.setState({
+      posts: this.props.posts,
+    })
+    console.log('PROPS:')
+    console.log(this.props)
     // console.log('Mounting');
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.posts !== this.props.posts) {
+      this.setState({
+        posts: this.props.posts,
+      })
+    }
+    console.log('PROPS:')
+    console.log(this.props)
+    // console.log('Mounting');
+  }
+
+  deleteFunc(post_id) {
+    this.setState(prevState => ({
+      posts: prevState.posts.filter(post => post.id != post_id)
+    }));
   }
 
   render() {
     const { classes } = this.props;
     return (
       <div className={classes.root}>
-      {this.props.posts.slice(0).reverse().map((post) =>
-          <Post post={post} key={post.id} />
+      {this.state.posts.slice(0).reverse().map((post) =>
+          <Post post={post} key={post.id} deleteFunc={this.deleteFunc} />
       )}
         {/*<Post />*/}
         {/*<Post />*/}
