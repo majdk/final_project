@@ -195,11 +195,19 @@ class Profile extends Component {
     this.state = {
       tab_index: 0,
       posts: [],
-      user_info: [],
+      user_info: {
+        username: '',
+        first_name: '',
+        last_name: '',
+        bio: '',
+        followers: 0,
+        following: 0,
+      },
       my_profile: true,
       is_followed: false,
       followers: [],
       following: [],
+      user_info_ready: false,
     }
     // console.log('Constructor');
     this.onFollow = this.onFollow.bind(this)
@@ -253,6 +261,7 @@ class Profile extends Component {
         this.setState({
           user_info: res,
           is_followed: res.isfollowing,
+          user_info_ready: true,
         })
         console.log(res)
         // console.log(res);
@@ -307,7 +316,7 @@ class Profile extends Component {
               <div className={classes.info}>
                 <div className={classes.follow_line}>
                   <Typography variant="h4" className={classes.userName}>{this.state.user_info.username}</Typography>
-                  {!this.state.my_profile &&
+                  {!this.state.my_profile && this.state.user_info_ready &&
                   (<Button
                       className={classes.follow_btn}
                       variant="contained"

@@ -56,9 +56,11 @@ class SimpleExample extends React.Component {
       lng: -0.09,
       zoom: 13,
       currentPos: [51.505, -0.09],
-      radius: 0,
+      radius: '',
       posts_in_radius: [],
       choseLocation: false,
+      empty_radius: true,
+      error: false,
     };
 
     this.searchTravels = this.searchTravels.bind(this);
@@ -72,6 +74,14 @@ class SimpleExample extends React.Component {
   }
 
   searchTravels() {
+    if (this.state.radius === "") {
+      this.setState({
+        empty_radius: true,
+        error: true,
+      });
+      console.log('EMPTY')
+      return;
+    }
     searchMap({
       km: this.state.radius,
       longitude: this.state.currentPos.lng,
@@ -80,6 +90,7 @@ class SimpleExample extends React.Component {
       if (res !== 'error') {
         console.log(res)
         this.setState({
+          choseLocation: false,
           posts_in_radius: res
         })
       } else {
@@ -98,7 +109,11 @@ class SimpleExample extends React.Component {
   }
 
   onRadiusChange(e) {
-    this.setState({radius: e.target.value})
+    this.setState({
+      radius: e.target.value,
+      empty_radius: false,
+      error: false,
+    })
   }
   render() {
     console.log('Rendering map...')
@@ -113,7 +128,7 @@ class SimpleExample extends React.Component {
           this.leafletMap = m;
         }}
       >
-        <ReactLeafletSearch position="topleft" closeResultsOnClick={true} />
+        <ReactLeafletSearch position="topleft" closeResultsOnClick={true} showMarker={false} showPopup={false}/>
         <TileLayer
           attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -124,7 +139,7 @@ class SimpleExample extends React.Component {
         {this.state.posts_in_radius.map((post) =>
             <Marker position={[post.latitude, post.longitude]} key={post.id}>
             <Popup>
-              {post.username}
+              {"\'" + post.title + "\'" + " by " + post.username }
             </Popup>
           </Marker>
         )}
@@ -136,7 +151,7 @@ class SimpleExample extends React.Component {
         </Marker>
         }
         <Control position="bottomleft">
-          <Button variant="contained" color="primary" onClick={this.searchTravels} disabled={!this.state.choseLocation}>
+          <Button variant="contained" color="primary" onClick={this.searchTravels} disabled={!this.state.choseLocation} >
             Search
           </Button>
         </Control>
@@ -155,6 +170,7 @@ class SimpleExample extends React.Component {
               }}
               labelWidth={0}
               onChange={this.onRadiusChange}
+              error={this.state.error}
             />
             <FormHelperText id="outlined-weight-helper-text">
               Radius
