@@ -76,7 +76,7 @@ const styles = theme => ({
     }
   },
   info: {
-
+    minWidth: "70%",
   },
   followers: {
     display: "flex",

@@ -155,7 +155,7 @@ class Post extends Component {
                       className={classes.avatar}
                       src={"/static/images/" + this.props.post.profile_pic}
                   >
-                    R
+
                   </Avatar>
                 </a>
               }
